@@ -1,11 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 
 function NavBar ({ orders }) {
     return (
         <div className="navbar bg-base-100">
   <div className="flex-1">
-    <a className="btn btn-ghost text-xl">Merger</a>
+    <Link to="/home" className="btn btn-ghost text-xl">Merger</Link>
   </div>
   <div className="flex-none">
     <div className="dropdown dropdown-end">

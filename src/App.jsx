@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+
+
 
 import {
   Route,
@@ -24,7 +25,10 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [hideHero, setHideHero] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
+
+
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -36,18 +40,22 @@ function App() {
     fetchOrders()
   }, [])
 
-  let { id } = useParams();  
 
 
 
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path='/' element={<MainLayout />}>
-        <Route path='home' element={<Hero showAddForm={showAddForm} setShowAddForm={setShowAddForm}/>} />
+        <Route path='home' element={<Hero
+          hideHero={hideHero}
+          setHideHero={setHideHero}
+          showAddForm={showAddForm}
+          setShowAddForm={setShowAddForm} />}
+        />
+
         <Route path='create' element={<CreateOrderForm />} />
         <Route path='orders' element={<OrderList orders={orders} />} />
         <Route path='order/:id' element={<OrderDetail />} />
-       
       </Route>
     )
   );

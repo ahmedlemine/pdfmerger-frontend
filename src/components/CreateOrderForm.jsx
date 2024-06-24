@@ -18,6 +18,7 @@ const CreateOrderForm = () => {
         const data = { name: orderName }
         const res = await mergerAxios.post('/orders/', data)
         const newOrder = res.data
+        
         navigate(`/order/${newOrder.id}/`)
     }
 
@@ -27,10 +28,13 @@ const CreateOrderForm = () => {
         cerateNewOrder(orderName)
     }
 
+
+
     return (
-        <div className="mt-10">
-            <div className="mt-10 mb-10 pt-10 pb-10 bg-base-200 border-dashed border-2 border-sky-500 justify-items-stretch">
+        <div className="m-10">
+            <div className="mt-10 mb-10 p-10 bg-base-200 border-2 border-rounded text-center">
                 <h2 className='mb-2'>Create a new merge</h2>
+                
                 <form onSubmit={handleSubmit}>
                     <div>
                         <input type="text" placeholder="name for new merge"
@@ -39,9 +43,11 @@ const CreateOrderForm = () => {
                         />
                     </div>
                     <div>
-                        <button className="btn btn-outline btn-neutral mt-3">Create</button>
+                        <button className="btn btn-outline btn-primary mt-3">Create</button>
+                        
                     </div>
                 </form>
+                
             </div>
         </div>
 
