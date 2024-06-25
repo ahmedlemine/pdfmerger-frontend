@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 
 function NavBar ({ orders }) {
     return (
-        <div className="navbar bg-base-100">
+        <div className="navbar bg-base-100 shadow-sm mb-10">
   <div className="flex-1">
-    <Link to="/home" className="btn btn-ghost text-xl">Merger</Link>
+    <Link to="/" className="btn btn-ghost text-xl">Merger</Link>
   </div>
   <div className="flex-none">
     <div className="dropdown dropdown-end">
@@ -34,7 +34,7 @@ function NavBar ({ orders }) {
           <span className="text-lg font-bold">7 merges</span>
           <span className="text-info">Subtotal: $0</span>
           <div className="card-actions">
-            <button className="btn btn-primary btn-block">View Merges</button>
+            <Link to="orders" className="btn btn-primary btn-block">View Merges</Link>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@ function NavBar ({ orders }) {
       <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
           <img
-            alt="Tailwind CSS Navbar component"
+            alt="user avatar"
             src="/src/assets/avatar.jpg" />
         </div>
       </div>
@@ -56,8 +56,8 @@ function NavBar ({ orders }) {
             <span className="badge">New</span>
           </a>
         </li>
-        <li><a>My Merges</a></li>
-        <li><a>Logout</a></li>
+        <li><Link to="/orders">My Merges</Link></li>
+        <li><Link to="/logout">Logout</Link></li>
       </ul>
     </div>
   </div>

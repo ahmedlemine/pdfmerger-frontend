@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 import { mergerAxios, fileUploaderAxios } from '../../axios'
 
@@ -22,7 +23,7 @@ const INITIAL_VIEW = {
 function reducer(viewState, { mode }) {
     switch (mode) {
         case "FILES NOT ENOUGH":
-            return { ...viewState, showAddFileBtn: true, };
+            return { ...viewState, showAddFileBtn: true, showAddFilesMsg: true,};
         case "ENOUGH FILES":
             return { ...viewState, showMergeBtn: true };
         case "FIVE FILES":
@@ -45,7 +46,7 @@ function OrderDetail() {
     const [apiError, setApiError] = useState(null)
     const [loading, setLoading] = useState(true)
     const [downloadUrl, setDownloadUrl] = useState()
-    const [showApiError, setShowApiError] = useState()
+    const [showApiError, setShowApiError] = useState(false)
 
     // get view state from reducer
     const { showAddFileBtn, showAddFilesMsg, showMergeBtn, showDownloadBtn, showDownloadURL } = viewState;
@@ -58,7 +59,7 @@ function OrderDetail() {
 
     useEffect(() => {
         const fetchOrder = async () => {
-            const {data} = await mergerAxios.get(`/orders/${id}/`)
+            const { data } = await mergerAxios.get(`/orders/${id}/`)
             setOrder(data)
             if (order.is_merged) {
                 dispatch({ mode: 'MERGED' })
@@ -67,54 +68,43 @@ function OrderDetail() {
             } else {
                 dispatch({ mode: 'FILES NOT ENOUGH' })
             }
-
-            // setFiles(data.pdf_files)
-            
-           
-
         }
+
         fetchOrder()
 
     }, [])
 
-    useEffect(()=> {
-        const fetchFiles = async () => {
-            const {data} = await mergerAxios.get(`/orders/${id}/files`)
-            setFiles(data)
-            console.log(files)
-            if (files.length < 2) {
-                dispatch({ mode: 'FILES NOT ENOUGH' })
-            }
-            if (files.length >= 2) {
-                dispatch({ mode: 'ENOUGH FILES' })
-            }
-            if (files.length >= 5) {
-                dispatch({ mode: 'FIVE FILES' })
-            } 
+
+    useEffect(() => {
+
+        if (files.length < 2) {
+            dispatch({ mode: 'FILES NOT ENOUGH' })
         }
+        if (files.length >= 2) {
+            dispatch({ mode: 'ENOUGH FILES' })
+        }
+        if (files.length >= 5) {
+            dispatch({ mode: 'FIVE FILES' })
+        }
+
+    }, [files])
+
+
+    const fetchFiles = async () => {
+        const { data } = await mergerAxios.get(`/orders/${id}/files/`)
+        setFiles(data)
+    }
+
+    useEffect(() => {
         fetchFiles()
     }, [])
 
 
-    // const fetchFiles = async () => {
-    //     const {data} = await mergerAxios.get(`/orders/${id}/files`)
-    //     setFiles(data)
-    //     console.log(files)
-    //     if (files.length < 2) {
-    //         dispatch({ mode: 'FILES NOT ENOUGH' })
-    //     }
-    //     if (files.length >= 2) {
-    //         dispatch({ mode: 'ENOUGH FILES' })
-    //     }
-    //     if (files.length >= 5) {
-    //         dispatch({ mode: 'FIVE FILES' })
-    //     } 
-    // }
-
     const deleteFile = async (id) => {
         await mergerAxios.delete(`files/${id}/delete/`).then((res) => {
             setFiles(files.filter((f) => f.id !== id))
-
+            toast.success("file deleted!")
+            fetchFiles()
         }).catch((error) => {
             setShowApiError(true)
 
@@ -122,7 +112,7 @@ function OrderDetail() {
                 setApiError("file doesn't exist.")
             }
         }).finally(() => {
-            // fetchFiles()
+            fetchFiles()
 
             if (files.length < 2) {
                 dispatch({ mode: 'FILES NOT ENOUGH' })
@@ -134,6 +124,7 @@ function OrderDetail() {
 
     const uploadFile = async (pdf, orderId) => {
         try {
+
             const newFile = await axios({
                 method: 'post',
                 url: `http://localhost:8000/api/v1/orders/${orderId}/add_files/`,
@@ -146,43 +137,50 @@ function OrderDetail() {
                 }
             })
 
-            setFiles([...files, newFile])
+
+            fetchFiles()
+            // setFiles([...files, newFile])
             if (files.length >= 2) {
                 dispatch({ mode: 'ENOUGH FILES' })
             }
             if (files.length >= 5) {
                 dispatch({ mode: 'FIVE FILES' })
             }
-        } catch {
-            (error) => {
-                setShowApiError(true)
 
-                if (error.response) {
-                    if (error.response.status == 400) {
-                        setApiError(error.response.data.error || error.response.data.file)
-                    }
-                } else if (error.request) {
-                    setApiError(error.request)
-                } else {
-                    setApiError(error.message)
+        } catch (error) {
+            setShowApiError(true)
+            setApiError('')
+            if (error.response) {
+                if (error.response.status === 400) {
+                    setApiError(error.response.data.error || error.response.data.file)
                 }
-                setApiError(error.config)
+            } else if (error.request) {
+                setApiError(error.request)
+            } else {
+                setApiError(error.message)
             }
-        }
+        };
+
     }
 
 
     const mergeOrder = async (orderId) => {
+        if(files.length <2) {
+            setShowApiError(true)
+            setApiError("not enough PDFs to merge. Please add at least 2 PDF files.")
+            return
+        }
         setShowApiError(false)
         setShowFileForm(false)
 
         await mergerAxios.get(`orders/${orderId}/merge/`).then((res) => {
             // setDownloadUrl(res.data.download_url)
             dispatch({ mode: 'MERGED' })
+            toast.success("merge completed!")
 
         }).catch((error) => {
             setShowApiError(true)
-            if (error.response.status == 400) {
+            if (error.response.status === 400) {
                 setApiError(error.response.data.error)
             }
         })
@@ -198,7 +196,7 @@ function OrderDetail() {
         }).catch((error) => {
             setShowApiError(true)
 
-            if (error.response.status == 400) {
+            if (error.response.status === 400) {
 
 
                 setApiError(error.response.data.error)
@@ -235,9 +233,9 @@ function OrderDetail() {
     }
     return (
         <>
-            <div className="card w-100 bg-base-100 shadow-xl">
+            <div className="card w-100 bg-base-100 shadow-xl mt-10">
                 <div className="card-body">
-                    <h2 className="card-title">{order.name || 'untitled order'}<span>({files.length} files)</span></h2>
+                    <h2 className="card-title">Merge: {order.name || 'untitled order'}<span>({files.length} files)</span></h2>
                     <div className="mt-2 mb-2">
                         {files.map(file => (
                             <FileCard key={file.id} file={file} deleteFile={deleteFile} />
@@ -250,7 +248,7 @@ function OrderDetail() {
                             disabled={!showAddFileBtn}
                             className="btn btn-outline btn-primary ml-2"
                         >
-                            {!shwoFileForm ? 'Add PDFs' : 'done'}
+                            {!shwoFileForm ? 'Add PDFs' : 'done adding PDFs?'}
                         </button>
                         <button onClick={() => mergeOrder(order.id)} disabled={!showMergeBtn} className="btn btn-outline">Merge</button>
                         <button onClick={() => downloadOrder(order.id)} disabled={!showDownloadBtn} className="btn btn-neutral">Download</button>
@@ -267,10 +265,10 @@ function OrderDetail() {
                         }
                     </div>
                 </div>
-                {showDownloadURL &&
+            </div>
+            {showDownloadURL &&
                     <div className='alert link link-info'><a href={baseDownloadURL + downloadUrl}>Download merged PDF</a></div>
                 }
-            </div>
             {shwoFileForm && <FileForm uploadFile={uploadFile} order={order} apiError={apiError} />}
 
         </>

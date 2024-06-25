@@ -1,25 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+} from 'react'
 
-
-
-import {
-  Route,
-  createBrowserRouter,
-  createRoutesFromElements,
-  RouterProvider,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import './App.css'
-import axios from 'axios'
-import mergerAxios from '../axios'
 
 import MainLayout from './layouts/MainLayout';
-import NavBar from './components/NavBar'
+import ErrorPage from './components/ErrorPage';
 import Hero from './components/Hero'
 import Login from './components/Login'
 import OrderList from './components/OrderList'
 import OrderDetail from './components/OrderDetail';
 import CreateOrderForm from './components/CreateOrderForm'
+import Logout from './components/Logout';
+
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -30,57 +26,58 @@ function App() {
 
 
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const res = await mergerAxios.get("/orders/")
-      setOrders(res.data)
-      setLoading(false)
-    }
-
-    fetchOrders()
-  }, [])
 
 
 
 
-  const router = createBrowserRouter(
-    createRoutesFromElements(
-      <Route path='/' element={<MainLayout />}>
-        <Route path='home' element={<Hero
-          hideHero={hideHero}
-          setHideHero={setHideHero}
-          showAddForm={showAddForm}
-          setShowAddForm={setShowAddForm} />}
-        />
 
-        <Route path='create' element={<CreateOrderForm />} />
-        <Route path='orders' element={<OrderList orders={orders} />} />
-        <Route path='order/:id' element={<OrderDetail />} />
-      </Route>
-    )
-  );
+  // const router = createBrowserRouter(
+  //   createRoutesFromElements(
+  //     <Route path='/' element={<MainLayout />} errorElement={<ErrorPage />} >
+  // <Route path='home' element={<Hero
+  //   hideHero={hideHero}
+  //   setHideHero={setHideHero}
+  //   showAddForm={showAddForm}
+  //   setShowAddForm={setShowAddForm} />}
+  // />
 
-  return <RouterProvider router={router} />;
+  //       <Route path='create' element={<CreateOrderForm />} />
+  //       <Route path='orders' element={<OrderList orders={orders} />} />
+  //       <Route path='login' element={<Login />} />
+  //       <Route path='logout' element={<Logout />} />
+  //       <Route path='order/:id' element={<OrderDetail />} />
+
+  //     </Route>
+  //   )
+  // );
+
+  // return <RouterProvider router={router} />;
 
 
   // if(!loggedIn) {
   //   return <Login setLoggedIn={setLoggedIn}/>
   // }
 
-  // return (
-  //   <>
-  //   <NavBar orders={orders}/>
-  //   <Hero setShowAddForm={setShowAddForm} showAddForm={showAddForm}/>
-  //   {showAddForm && <CreateOrderForm />}
-  //   {loading ? 
-  //     <span className="loading loading-spinner text-primary"></span>
-  //   :
-  //   <h1>Ordes go here</h1>
-  //   }
-    
-    
-  //   </>
-  // )
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Hero
+            hideHero={hideHero}
+            setHideHero={setHideHero}
+            showAddForm={showAddForm}
+            setShowAddForm={setShowAddForm} />}
+          />
+          <Route path="orders" element={<OrderList orders={orders}/>} />
+          <Route path='create' element={<CreateOrderForm />} />
+          <Route path="login" element={<Login />} />
+          <Route path="logout" element={<Logout />} />
+          <Route path="order/:id" element={<OrderDetail />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App

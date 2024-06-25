@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import Cookies from 'js-cookie';
-import { useNavigate } from 'react-router-dom';
 
-// import OrderSteps from './OrderSteps';
 
 const FileForm = ({ order, uploadFile, uploadError }) => {
-    // const [currentStep, setCurrentStep] = useState()
+
     const [pdf, setPdf] = useState()
     const [showForm, setShowForm] = useState(true)
 
@@ -18,15 +15,7 @@ const FileForm = ({ order, uploadFile, uploadError }) => {
         setPdf('')
         uploadFile(pdf, order.id)
         
-        // console.log("current step==== ", currentStep)
-        // setId(currentOrder.id)
-        // console.log("ID: ", currentOrder.id)
-        // updateStep(3)
-
-
     }
-
-
 
 
     return (

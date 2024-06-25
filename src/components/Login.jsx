@@ -9,7 +9,7 @@ const Login = ({ setLoggedIn }) => {
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
 
     // Login with JWT access/refresh token system:
@@ -19,10 +19,13 @@ const Login = ({ setLoggedIn }) => {
 
     const doLogin = async (user) => {
         const refreshToken = Cookies.get('refresh_token')
-        if(!refreshToken || refreshToken === 'undefined') {
+        if (!refreshToken || refreshToken === 'undefined') {
             return createNewToken(user)
         }
-        return refreshAccess(refreshToken)
+
+        refreshAccess(refreshToken)
+        setLoggedIn(true)
+        navigate('/home')
     }
 
     const refreshAccess = async (refreshToken) => {
@@ -32,7 +35,7 @@ const Login = ({ setLoggedIn }) => {
             const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
             Cookies.set('access_token', data.access);
             Cookies.set('refresh_token', data.refresh);
-            setLoggedIn(true)
+            // setLoggedIn(true)
             return data.access
         }
         catch (error) {
@@ -47,11 +50,20 @@ const Login = ({ setLoggedIn }) => {
             Cookies.set('access_token', data.access);
             Cookies.set('refresh_token', data.refresh);
             setLoggedIn(true)
-            
+
             return data.access
         }
         catch (error) {
-            setErrorMessage(error.message)
+            if (error.response) {
+                if (error.response.status === 401) {
+                    console.log(error.response.data.detail)
+                    setErrorMessage(error.response.data.detail)
+                }
+            } else {
+                console.log(error)
+                setErrorMessage(error.message)
+            }
+
         }
     }
 
@@ -70,7 +82,7 @@ const Login = ({ setLoggedIn }) => {
             <div className="hero bg-base-200 min-h-screen">
                 <div className="hero-content flex-col lg:flex-row-reverse">
                     <div className="text-center lg:text-left">
-                        <h1 className="text-5xl font-bold">Login now!</h1>
+                        <h1 className="text-5xl font-bold">Login</h1>
                         <p className="py-6">
                             To keep each user's documents private and secure, every user must have an account.
                         </p>
@@ -101,10 +113,11 @@ const Login = ({ setLoggedIn }) => {
                             <div className="form-control mt-6">
                                 <button className="btn btn-primary">Login</button>
                             </div>
+                            {errorMessage &&
+                                <p className='text-red-600'>Erorr: {errorMessage}</p>
+                            }
                         </form>
-                        {errorMessage &&
-                            <p>{errorMessage}</p>
-                        }
+
                     </div>
                 </div>
             </div>
