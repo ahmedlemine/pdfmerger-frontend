@@ -26,38 +26,6 @@ function App() {
 
 
 
-
-
-
-
-
-  // const router = createBrowserRouter(
-  //   createRoutesFromElements(
-  //     <Route path='/' element={<MainLayout />} errorElement={<ErrorPage />} >
-  // <Route path='home' element={<Hero
-  //   hideHero={hideHero}
-  //   setHideHero={setHideHero}
-  //   showAddForm={showAddForm}
-  //   setShowAddForm={setShowAddForm} />}
-  // />
-
-  //       <Route path='create' element={<CreateOrderForm />} />
-  //       <Route path='orders' element={<OrderList orders={orders} />} />
-  //       <Route path='login' element={<Login />} />
-  //       <Route path='logout' element={<Logout />} />
-  //       <Route path='order/:id' element={<OrderDetail />} />
-
-  //     </Route>
-  //   )
-  // );
-
-  // return <RouterProvider router={router} />;
-
-
-  // if(!loggedIn) {
-  //   return <Login setLoggedIn={setLoggedIn}/>
-  // }
-
   return (
     <BrowserRouter>
       <Routes>

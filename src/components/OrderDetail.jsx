@@ -10,6 +10,7 @@ import FileCard from './FileCard'
 import FileForm from './FileForm'
 
 
+const baseDownloadURL = 'http://localhost:8000/';
 
 
 const INITIAL_VIEW = {
@@ -23,9 +24,9 @@ const INITIAL_VIEW = {
 function reducer(viewState, { mode }) {
     switch (mode) {
         case "FILES NOT ENOUGH":
-            return { ...viewState, showAddFileBtn: true, showAddFilesMsg: true,};
+            return { ...viewState, showAddFileBtn: true, showAddFilesMsg: true, showMergeBtn: false, showDownloadBtn: false };
         case "ENOUGH FILES":
-            return { ...viewState, showMergeBtn: true };
+            return { ...viewState, showMergeBtn: true, showAddFileBtn: true };
         case "FIVE FILES":
             return { ...viewState, showAddFileBtn: false, showAddFilesMsg: false, showMergeBtn: true };
         case "MERGED":
@@ -53,25 +54,15 @@ function OrderDetail() {
 
     const { id } = useParams()
 
-    const baseDownloadURL = 'http://localhost:8000/';
 
+    useEffect(() => {
+        fetchOrder()
+
+    }, [])
 
 
     useEffect(() => {
-        const fetchOrder = async () => {
-            const { data } = await mergerAxios.get(`/orders/${id}/`)
-            setOrder(data)
-            if (order.is_merged) {
-                dispatch({ mode: 'MERGED' })
-            } else if (order.download_count > 0) {
-                dispatch({ mode: 'DOWNLOADED' })
-            } else {
-                dispatch({ mode: 'FILES NOT ENOUGH' })
-            }
-        }
-
-        fetchOrder()
-
+        fetchFiles()
     }, [])
 
 
@@ -83,11 +74,25 @@ function OrderDetail() {
         if (files.length >= 2) {
             dispatch({ mode: 'ENOUGH FILES' })
         }
-        if (files.length >= 5) {
+        if (files.length > 4) {
             dispatch({ mode: 'FIVE FILES' })
+            setShowFileForm(false)
         }
 
     }, [files])
+
+
+    const fetchOrder = async () => {
+        const { data } = await mergerAxios.get(`/orders/${id}/`)
+        setOrder(data)
+        if (order.is_merged) {
+            dispatch({ mode: 'MERGED' })
+        } else if (order.download_count > 0) {
+            dispatch({ mode: 'DOWNLOADED' })
+        } else {
+            dispatch({ mode: 'FILES NOT ENOUGH' })
+        }
+    }
 
 
     const fetchFiles = async () => {
@@ -95,29 +100,25 @@ function OrderDetail() {
         setFiles(data)
     }
 
-    useEffect(() => {
-        fetchFiles()
-    }, [])
-
 
     const deleteFile = async (id) => {
-        await mergerAxios.delete(`files/${id}/delete/`).then((res) => {
+        try {
+            await mergerAxios.delete(`files/${id}/delete/`)
             setFiles(files.filter((f) => f.id !== id))
+            fetchFiles()
             toast.success("file deleted!")
-            fetchFiles()
-        }).catch((error) => {
-            setShowApiError(true)
-
-            if (error.response.status === 404) {
-                setApiError("file doesn't exist.")
-            }
-        }).finally(() => {
-            fetchFiles()
-
             if (files.length < 2) {
                 dispatch({ mode: 'FILES NOT ENOUGH' })
             }
-        })
+
+        } catch (error) {
+            setShowApiError(true)
+            if (error.response.status === 404) {
+                setApiError("file doesn't exist.")
+            } else {
+                console.error(error)
+            }
+        };
 
     }
 
@@ -137,13 +138,15 @@ function OrderDetail() {
                 }
             })
 
+            setFiles([...files, newFile])
 
             fetchFiles()
-            // setFiles([...files, newFile])
+
             if (files.length >= 2) {
                 dispatch({ mode: 'ENOUGH FILES' })
             }
-            if (files.length >= 5) {
+            if (files.length > 4) {
+                setShowFileForm(false)
                 dispatch({ mode: 'FIVE FILES' })
             }
 
@@ -165,7 +168,7 @@ function OrderDetail() {
 
 
     const mergeOrder = async (orderId) => {
-        if(files.length <2) {
+        if (files.length < 2) {
             setShowApiError(true)
             setApiError("not enough PDFs to merge. Please add at least 2 PDF files.")
             return
@@ -177,6 +180,7 @@ function OrderDetail() {
             // setDownloadUrl(res.data.download_url)
             dispatch({ mode: 'MERGED' })
             toast.success("merge completed!")
+            fetchOrder()
 
         }).catch((error) => {
             setShowApiError(true)
@@ -267,12 +271,12 @@ function OrderDetail() {
                 </div>
             </div>
             {showDownloadURL &&
-                    <div className='alert link link-info'><a href={baseDownloadURL + downloadUrl}>Download merged PDF</a></div>
-                }
+                <div className='alert link link-info'><a href={baseDownloadURL + downloadUrl}>Download merged PDF</a></div>
+            }
             {shwoFileForm && <FileForm uploadFile={uploadFile} order={order} apiError={apiError} />}
 
         </>
     )
 }
 
-export default OrderDetail
+export default OrderDetail;

@@ -24,7 +24,7 @@ const FileForm = ({ order, uploadFile, uploadError }) => {
             <div className='flex items-center justify-center'>
 
             
-            <div className="mt-10 bg-base-200 text-center w-4/5 border-2">
+            <div className="mt-10 mb-10 bg-base-200 text-center w-4/5 border-2">
                 <div className='mt-10'>
                     <form onSubmit={handleSubmit}>
                         <div className='mt-4'>

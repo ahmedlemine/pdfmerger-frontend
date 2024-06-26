@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ function Logout() {
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
         setLoading(false)
-        navigate('login')
+        navigate('/login')
     }, [])
   return (
     <>

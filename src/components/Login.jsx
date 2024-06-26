@@ -4,7 +4,7 @@ import axios from 'axios';
 import { baseURL } from '../../axios'
 import { useNavigate } from 'react-router-dom';
 
-const Login = ({ setLoggedIn }) => {
+const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
@@ -24,8 +24,8 @@ const Login = ({ setLoggedIn }) => {
         }
 
         refreshAccess(refreshToken)
-        setLoggedIn(true)
-        navigate('/home')
+        // setLoggedIn(true)
+        navigate('/')
     }
 
     const refreshAccess = async (refreshToken) => {
@@ -49,7 +49,9 @@ const Login = ({ setLoggedIn }) => {
             const { data } = await axios.post("http://localhost:8000/api/v1/auth/jwt/create/", user)
             Cookies.set('access_token', data.access);
             Cookies.set('refresh_token', data.refresh);
-            setLoggedIn(true)
+            // setLoggedIn(true)
+            navigate('/')
+
 
             return data.access
         }
