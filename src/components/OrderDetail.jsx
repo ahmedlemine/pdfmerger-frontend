@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+
+import { useContext } from 'react';
+import { MergerContext } from '../Context';
 
 import { mergerAxios, fileUploaderAxios } from '../../axios'
 
@@ -40,7 +43,7 @@ function reducer(viewState, { mode }) {
 
 function OrderDetail() {
     const [viewState, dispatch] = useReducer(reducer, INITIAL_VIEW);
-    // use empty Object as initial state to solve order undefined issue (seems like if type changes it won't get updated to fetched data)
+    // use empty Object as initial state to solve "order undefined" error (seems like if type changes, it won't get updated to fetched data)
     const [order, setOrder] = useState({})
     const [files, setFiles] = useState([])
     const [shwoFileForm, setShowFileForm] = useState(false)
@@ -48,6 +51,9 @@ function OrderDetail() {
     const [loading, setLoading] = useState(true)
     const [downloadUrl, setDownloadUrl] = useState()
     const [showApiError, setShowApiError] = useState(false)
+
+
+    const { isLoggedIn } = useContext(MergerContext)
 
     // get view state from reducer
     const { showAddFileBtn, showAddFilesMsg, showMergeBtn, showDownloadBtn, showDownloadURL } = viewState;
@@ -177,7 +183,6 @@ function OrderDetail() {
         setShowFileForm(false)
 
         await mergerAxios.get(`orders/${orderId}/merge/`).then((res) => {
-            // setDownloadUrl(res.data.download_url)
             dispatch({ mode: 'MERGED' })
             toast.success("merge completed!")
             fetchOrder()
@@ -225,7 +230,7 @@ function OrderDetail() {
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="card-title">Merge Complete</h2>
-                    <p>Merge {order.name} is complete. You can download the final merged PDF.</p>
+                    <p>Merge <b>{order.name}</b> is complete. You can download the final merged PDF.</p>
                     <div className="card-actions justify-end">
                         <a role='button' className='btn btn-outline btn-success' href={baseDownloadURL + order.download_url} target='_blank'>Download merged PDF</a>
 
@@ -237,7 +242,7 @@ function OrderDetail() {
     }
     return (
         <>
-            <div className="card w-100 bg-base-100 shadow-xl mt-10">
+           <div className="card w-100 bg-base-100 shadow-xl mt-10">
                 <div className="card-body">
                     <h2 className="card-title">Merge: {order.name || 'untitled order'}<span>({files.length} files)</span></h2>
                     <div className="mt-2 mb-2">
@@ -245,7 +250,7 @@ function OrderDetail() {
                             <FileCard key={file.id} file={file} deleteFile={deleteFile} />
                         ))}
                     </div>
-                    {showAddFilesMsg && <p>Add at least 2 PDFs to merge</p>}
+                    {showAddFilesMsg && <p>Add at least 2 PDFs to merge (max 5 PDFs).</p>}
                     <div className="card-actions justify-end">
                         <button
                             onClick={() => handleAddFile()}
@@ -274,7 +279,7 @@ function OrderDetail() {
                 <div className='alert link link-info'><a href={baseDownloadURL + downloadUrl}>Download merged PDF</a></div>
             }
             {shwoFileForm && <FileForm uploadFile={uploadFile} order={order} apiError={apiError} />}
-
+        
         </>
     )
 }

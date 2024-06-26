@@ -10,7 +10,8 @@ import { MergerContext } from '../Context';
 
 import { baseURL } from '../../axios'
 
-const Login = () => {
+const Signup = () => {
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
@@ -19,47 +20,20 @@ const Login = () => {
 
     const navigate = useNavigate();
 
-
-    // Login with JWT access/refresh token system:
-    // 1- check cookies if there is an access token, if yes use it to login, if not =>
-    // 2- check coockies if there is a refresh token, if yes use it to get new access token, if not =>
-    // 3- use email/password to create a new set of tokens: access & refresh
-
-    const doLogin = async (user) => {
-        const refreshToken = Cookies.get('refresh_token')
-        if (!refreshToken || refreshToken === 'undefined') {
-            return createNewToken(user)
-        }
-
-        refreshAccess(refreshToken)
-        setIsLoggedIn(true)
+    const doSignup = async (newUser) => {
+        // important: flush existing tokens from cookies and set privious user to {}.
         setUser({})
-        toast.success("Logged in successfully!")
-        navigate('/', { replace: true })
-    }
-
-    const refreshAccess = async (refreshToken) => {
-        const payload = { refresh: refreshToken }
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
 
         try {
-            const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
-            Cookies.set('access_token', data.access);
-            return data.access
-        }
-        catch (error) {
-            setErrorMessage(error.message)
-        }
-    }
-
-
-    const createNewToken = async (user) => {
-        try {
-            const { data } = await axios.post("http://localhost:8000/api/v1/auth/jwt/create/", user)
+            const { data } = await axios.post("http://localhost:8000/api/v1/auth/users/", user)
+            console.log(data)
             Cookies.set('access_token', data.access);
             Cookies.set('refresh_token', data.refresh);
+
             setIsLoggedIn(true)
             navigate('/')
-
 
             return data.access
         }
@@ -80,11 +54,12 @@ const Login = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        const user = {
+        const newUser = {
+            name: name,
             email: email,
             password: password
         }
-        doLogin(user)
+        doSignup(newUser)
     }
 
     if (isLoggedIn) {
@@ -96,7 +71,7 @@ const Login = () => {
             <div className="hero bg-base-200 min-h-screen">
                 <div className="hero-content flex-col lg:flex-row-reverse">
                     <div className="text-center lg:text-left">
-                        <h1 className="text-5xl font-bold">Login</h1>
+                        <h1 className="text-5xl font-bold">Sign Up</h1>
                         <p className="py-6">
                             To keep each user's documents private, every user must have an account.
                         </p>
@@ -105,12 +80,21 @@ const Login = () => {
                         <form onSubmit={onSubmit} className="card-body">
                             <div className="form-control">
                                 <label className="label">
+                                    <span className="label-text">Name</span>
+                                </label>
+                                <input
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                    type="text" placeholder="name" className="input input-bordered" required autoFocus />
+                            </div>
+                            <div className="form-control">
+                                <label className="label">
                                     <span className="label-text">Email</span>
                                 </label>
                                 <input
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
-                                    type="email" placeholder="email" className="input input-bordered" required autoFocus />
+                                    type="email" placeholder="email" className="input input-bordered" required />
                             </div>
                             <div className="form-control">
                                 <label className="label">
@@ -121,9 +105,6 @@ const Login = () => {
                                     onChange={e => setPassword(e.target.value)}
                                     type="password" placeholder="password" className="input input-bordered" required />
                                 <label className="label">
-                                    <span className='label-text-alt'>
-                                        Don't have account?
-                                    </span>
                                     <Link to="/signup" className="label-text-alt link link-hover">Signup</Link>
                                 </label>
                             </div>
@@ -142,4 +123,4 @@ const Login = () => {
         </>
     )
 };
-export default Login;
+export default Signup;

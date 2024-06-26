@@ -32,7 +32,7 @@ const CreateOrderForm = () => {
 
     return (
         <div className="m-10">
-            <div className="mt-10 mb-10 p-10 bg-base-200 border-2 border-rounded text-center">
+            <div className="mt-10 mb-10 p-10 bg-base-200 text-center place-items-center">
                 <h2 className='mb-2'>Create a new merge</h2>
                 
                 <form onSubmit={handleSubmit}>

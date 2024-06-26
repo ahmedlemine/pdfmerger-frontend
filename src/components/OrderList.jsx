@@ -50,49 +50,64 @@ function OrderList() {
   return (
     <>
       {loading ? (
-        <div className="loading loading-spinner text-primary"></div>
+        <div className="loading loading-spinner text-primary text-xl"></div>
       ) : (
         <>
-          <h1 className='text-2xl font-bold mb-4 text-center'>My Merges</h1>
-          <div className="overflow-x-auto m-5">
-            <table className="table">
-              {/* head */}
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Created On</th>
-                  <th>Merged?</th>
-                  <th>Downloads</th>
-                  <th>PDF files</th>
-                  <th>Manage</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  orders.map(order =>
-                    <tr key={order.id}>
-                      <td>{order.name}</td>
-                      <td>{getDate(order.created_on)}</td>
-                      <td className={order.is_merged ? "text-green-600" : ""} >{order.is_merged ? <FaCheckCircle /> : "No"}</td>
-                      <td>{order.download_count}</td>
-                      <td>{order.pdf_files && order.pdf_files.length}</td>
+          {orders.length ? (
 
-                      <td>
-                        <Link to={`/order/${order.id}/`}><FaPen /></Link>
-                      </td>
-                      <td className="text-red-400" style={{ cursor: 'pointer' }} onClick={() => handleDelete(order.id)}><FaTrash /></td>
 
+            <>
+              <h1 className='text-2xl font-bold mb-4 text-center'>My Merges</h1>
+              <div className="overflow-x-auto m-5">
+                <table className="table">
+                  {/* head */}
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Created On</th>
+                      <th>Merged?</th>
+                      <th>Downloads</th>
+                      <th>PDF files</th>
+                      <th>Manage</th>
+                      <th>Delete</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      orders.map(order =>
+                        <tr key={order.id}>
+                          <td>{order.name}</td>
+                          <td>{getDate(order.created_on)}</td>
+                          <td className={order.is_merged ? "text-green-600" : ""} >{order.is_merged ? <FaCheckCircle /> : "No"}</td>
+                          <td>{order.download_count}</td>
+                          <td>{order.pdf_files && order.pdf_files.length}</td>
 
-                  )
-                }
+                          <td>
+                            <Link to={`/order/${order.id}/`}><FaPen /></Link>
+                          </td>
+                          <td className="text-red-400" style={{ cursor: 'pointer' }} onClick={() => handleDelete(order.id)}><FaTrash /></td>
+
+                        </tr>
+
+                      )
+                    }
 
 
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
 
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className='min-h-screen'>
+              <div className="card bg-base-200 border-2 border-dashed grid m-20 min-h-80 min-w-96 place-items-center">
+                <p>No merges yet.</p>
+                <Link to='/create' className="btn btn-primary mr-2">Create New Merge</Link>
+              </div>
+            </div>
+
+          )}
+
 
         </>)
       }

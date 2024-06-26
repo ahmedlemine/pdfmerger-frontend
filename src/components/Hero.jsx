@@ -1,44 +1,33 @@
-import React, { useState } from 'react';
-import Cookies from 'js-cookie';
-import CreateOrderForm from './CreateOrderForm'
-import Login from './Login'
-import ProtectedRoute from './ProtectedRoute';
-
-function Hero({ hideHero, setHideHero, showAddForm, setShowAddForm }) {
-    const [loggedIn, setLoggedIn] = useState(Cookies.get('access_token') ? true : false)
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { MergerContext } from '../Context';
 
 
-    const handleShowAddForm = () => {
-        setHideHero(v => !v)
-        setShowAddForm(v => !v)
-    }
+function Hero() {
+    const { isLoggedIn } = useContext(MergerContext)
 
 
-    // if (!loggedIn) {
-    //     return <Login setLoggedIn={setLoggedIn} />
-    // }
+
     return (
         <>
-            {loggedIn ? (
-                <ProtectedRoute>
-                    {!hideHero &&
-                        <div className="hero bg-base-200 min-h-300">
-                            <div className="hero-content text-center">
-                                <div className="max-w-md">
-                                    <h1 className="text-5xl font-bold">PDF Merger</h1>
-                                    <p className="py-6">
-                                        Merge PDF files
-                                    </p>
-                                    <button onClick={handleShowAddForm} className="btn btn-primary">New Merge</button>
-                                </div>
-                            </div>
-                        </div>}
-                    {showAddForm && <CreateOrderForm />}
-                </ProtectedRoute>
-            ) : (
-                <Login />
-            )}
-
+                <div className="hero bg-base-200 min-h-screen">
+                    <div className="hero-content text-center">
+                        <div className="max-w-md">
+                            <h1 className="text-5xl font-bold">PDF Merger</h1>
+                            <p className="py-6">
+                                Merge PDF files securely!
+                            </p>
+                            {isLoggedIn ? (
+                                <>
+                                    <Link to='/create' className="btn btn-primary mr-2">New Merge</Link>
+                                    <Link to='/orders' className="btn btn-primary btn-outline ml-2">My Merges</Link>
+                                </>
+                            ) : (
+                                <Link to='/login' className="btn btn-primary">Login</Link>
+                            )}
+                        </div>
+                    </div>
+                </div>
         </>
     )
 }

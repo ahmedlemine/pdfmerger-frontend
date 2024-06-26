@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 
 const FileForm = ({ order, uploadFile, uploadError }) => {
+    const [pdf, setPdf] = useState(null)
 
-    const [pdf, setPdf] = useState()
-    const [showForm, setShowForm] = useState(true)
+    const fileInput = useRef()
 
     const handleChange = (e) => {
         setPdf(e.target.files[0])
@@ -12,19 +12,18 @@ const FileForm = ({ order, uploadFile, uploadError }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        setPdf('')
         uploadFile(pdf, order.id)
-        
+        fileInput.current.value = ''
     }
 
 
     return (
         <>
-            {showForm && 
+            
             <div className='flex items-center justify-center'>
 
             
-            <div className="mt-10 mb-10 bg-base-200 text-center w-4/5 border-2">
+            <div className="mt-10 mb-10 bg-base-200 text-center w-4/5">
                 <div className='mt-10'>
                     <form onSubmit={handleSubmit}>
                         <div className='mt-4'>
@@ -35,6 +34,7 @@ const FileForm = ({ order, uploadFile, uploadError }) => {
                             <input type="file"
                                 className="file-input file-input-bordered file-input-outline w-full max-w-xs"
                                 placeholder="add a file to merger"
+                                ref={fileInput}
                                 onChange={(e) => handleChange(e)}
                                 name="filename" />
                         </div>
@@ -54,7 +54,7 @@ const FileForm = ({ order, uploadFile, uploadError }) => {
                 </div>
             </div>
             </div>
-            }
+            
 
         </>
 

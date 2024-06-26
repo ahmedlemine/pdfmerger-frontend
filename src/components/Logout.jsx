@@ -1,25 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
+import { MergerContext } from '../Context';
+import { toast } from 'react-toastify';
+
 function Logout() {
-    const [loading, setLoading] = useState(true)
 
-    const navigate = useNavigate()
+  const { setIsLoggedIn, setUser } = useContext(MergerContext)
 
-    useEffect(() => {
-        Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-        setLoading(false)
-        navigate('/login')
-    }, [])
+  const navigate = useNavigate()
+
+  const logOut = () => {
+      setUser({})
+      Cookies.remove('access_token')
+      Cookies.remove('refresh_token')
+      setIsLoggedIn(false)
+      toast.success("Logged out successfully")
+      navigate("/login")
+  }
+
+
+
   return (
     <>
-    {loading ? (
-        <h2>Signing out...</h2>
-    ) : (
-        <h2>Signed out.</h2>
-    )}
+    <div className='card bg-base-100 max-w-sm shrink-0 shadow-2xl place-items-center'>
+
+      <h2>Logout?</h2>
+      <button onClick={() => logOut()} className='btn btn-primary'>Logout</button>
+    </div>
+
     </>
 
   )
