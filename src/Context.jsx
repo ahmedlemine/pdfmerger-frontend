@@ -1,4 +1,3 @@
 import { createContext } from 'react';
 
-export const MergerContext = createContext({
-});
+export const CurrentUserContext = createContext({});

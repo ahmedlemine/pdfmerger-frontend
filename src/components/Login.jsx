@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 
 import { useNavigate } from 'react-router-dom';
-import { MergerContext } from '../Context';
+import { CurrentUserContext } from '../Context';
 
 import { baseURL } from '../../axios'
 
@@ -15,7 +15,7 @@ const Login = () => {
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
-    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(MergerContext)
+    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(CurrentUserContext)
 
     const navigate = useNavigate();
 
@@ -32,8 +32,10 @@ const Login = () => {
         }
 
         refreshAccess(refreshToken)
+        getUser()
+        
         setIsLoggedIn(true)
-        setUser({})
+        
         toast.success("Logged in successfully!")
         navigate('/', { replace: true })
     }
@@ -76,6 +78,26 @@ const Login = () => {
 
         }
     }
+
+
+
+    const getUser = async () => {
+        try {
+          const res = await mergerAxios.get('/auth/users/me/')
+          console.log(res.data)
+          setUser(res.data)
+  
+        } catch (error) {
+          if (error.response.status === 401) {
+            console.error(error)
+  
+            setIsLoggedIn(false)
+          } else {
+            console.error(error)
+          }
+        }
+  
+      };
 
 
     const onSubmit = async (e) => {

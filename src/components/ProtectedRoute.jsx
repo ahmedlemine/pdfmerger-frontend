@@ -1,11 +1,11 @@
 import Cookies from 'js-cookie';
 import { useContext } from 'react';
-import { MergerContext } from '../Context';
+import { CurrentUserContext } from '../Context';
 import { Navigate } from 'react-router-dom';
 
 
 function ProtectedRoute({ children }) {
-  const { isLoggedIn } = useContext(MergerContext)
+  const { isLoggedIn } = useContext(CurrentUserContext)
 
   
 

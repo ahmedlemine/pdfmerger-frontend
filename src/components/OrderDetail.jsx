@@ -4,8 +4,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
-import { useContext } from 'react';
-import { MergerContext } from '../Context';
 
 import { mergerAxios, fileUploaderAxios } from '../../axios'
 
@@ -53,7 +51,6 @@ function OrderDetail() {
     const [showApiError, setShowApiError] = useState(false)
 
 
-    const { isLoggedIn } = useContext(MergerContext)
 
     // get view state from reducer
     const { showAddFileBtn, showAddFilesMsg, showMergeBtn, showDownloadBtn, showDownloadURL } = viewState;
@@ -89,21 +86,46 @@ function OrderDetail() {
 
 
     const fetchOrder = async () => {
-        const { data } = await mergerAxios.get(`/orders/${id}/`)
-        setOrder(data)
-        if (order.is_merged) {
-            dispatch({ mode: 'MERGED' })
-        } else if (order.download_count > 0) {
-            dispatch({ mode: 'DOWNLOADED' })
-        } else {
-            dispatch({ mode: 'FILES NOT ENOUGH' })
+        try {
+            const { data } = await mergerAxios.get(`/orders/${id}/`)
+            setOrder(data)
+            if (data.is_merged) {
+                dispatch({ mode: 'MERGED' })
+            } else if (data.download_count > 0) {
+                dispatch({ mode: 'DOWNLOADED' })
+            } else if (data.pdf_files.length > 1) {
+                dispatch({ mode: 'ENOUGH FILES' })
+            } else {
+                dispatch({ mode: 'FILES NOT ENOUGH' })
+            }
+        } catch (error) {
+            setShowApiError(true)
+            if (error.response.status === 404) {
+                setApiError("No order found with this ID.")
+            } else {
+                setApiError(error)
+
+                throw new Error(error)
+                console.error(error)
+            }
         }
+
     }
 
 
     const fetchFiles = async () => {
-        const { data } = await mergerAxios.get(`/orders/${id}/files/`)
-        setFiles(data)
+        try {
+            const { data } = await mergerAxios.get(`/orders/${id}/files/`)
+            setFiles(data)
+        } catch (error) {
+            setShowApiError(true)
+            if (error.response.status === 404) {
+                setApiError("No order found with this ID.")
+            } else {
+                setApiError(error)
+                console.error(error)
+            }
+        }
     }
 
 
@@ -161,8 +183,13 @@ function OrderDetail() {
             setApiError('')
             if (error.response) {
                 if (error.response.status === 400) {
+                    console.log(error.response.data.detail)
                     setApiError(error.response.data.error || error.response.data.file)
+                } else if (error.response.status === 401) {
+                    setApiError("Not authorized. Please check you're logged in.")
+                    console.error(error.response.data.detail)
                 }
+
             } else if (error.request) {
                 setApiError(error.request)
             } else {
@@ -242,7 +269,7 @@ function OrderDetail() {
     }
     return (
         <>
-           <div className="card w-100 bg-base-100 shadow-xl mt-10">
+            <div className="card w-100 bg-base-100 shadow-xl mt-10">
                 <div className="card-body">
                     <h2 className="card-title">Merge: {order.name || 'untitled order'}<span>({files.length} files)</span></h2>
                     <div className="mt-2 mb-2">
@@ -279,7 +306,7 @@ function OrderDetail() {
                 <div className='alert link link-info'><a href={baseDownloadURL + downloadUrl}>Download merged PDF</a></div>
             }
             {shwoFileForm && <FileForm uploadFile={uploadFile} order={order} apiError={apiError} />}
-        
+
         </>
     )
 }

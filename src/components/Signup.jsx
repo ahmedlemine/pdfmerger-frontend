@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 
 import { useNavigate } from 'react-router-dom';
-import { MergerContext } from '../Context';
+import { CurrentUserContext } from '../Context';
 
 import { baseURL } from '../../axios'
 
@@ -16,26 +16,21 @@ const Signup = () => {
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
-    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(MergerContext)
+    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(CurrentUserContext)
 
     const navigate = useNavigate();
 
     const doSignup = async (newUser) => {
-        // important: flush existing tokens from cookies and set privious user to {}.
+        // flush existing tokens from cookies and set privious user to {}.
         setUser({})
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
 
         try {
-            const { data } = await axios.post("http://localhost:8000/api/v1/auth/users/", user)
-            console.log(data)
-            Cookies.set('access_token', data.access);
-            Cookies.set('refresh_token', data.refresh);
+            await axios.post("http://localhost:8000/api/v1/auth/users/", newUser)
+            toast.success("Successfully signed up. Please login now.")
+            navigate('/login')
 
-            setIsLoggedIn(true)
-            navigate('/')
-
-            return data.access
         }
         catch (error) {
             if (error.response) {

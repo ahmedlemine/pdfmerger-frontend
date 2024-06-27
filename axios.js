@@ -12,6 +12,7 @@ const mergerAxios = axios.create({
 			: null,
 		'Content-Type': 'application/json',
 		accept: 'application/json',
+		
 	}, 
 });
 
@@ -25,6 +26,7 @@ const fileUploaderAxios = axios.create({
 			: null,
 		'Content-Type': 'multipart/form-data',
 		accept: 'application/json',
+		// withCredentials: true
 	}, 
 });
 

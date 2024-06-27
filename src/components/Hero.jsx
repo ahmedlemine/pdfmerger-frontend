@@ -1,10 +1,10 @@
-import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { MergerContext } from '../Context';
+import { useContext } from 'react';
+import { CurrentUserContext } from '../Context';
 
 
 function Hero() {
-    const { isLoggedIn } = useContext(MergerContext)
+    const { isLoggedIn } = useContext(CurrentUserContext)
 
 
 
