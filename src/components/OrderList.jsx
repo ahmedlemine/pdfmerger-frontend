@@ -57,7 +57,7 @@ function OrderList() {
 
 
             <>
-              <h1 className='text-2xl font-bold mb-4 text-center'>My Merges</h1>
+              <h1 className='text-2xl font-bold mb-4 text-center'>My Merges ({orders.length})</h1>
               <div className="overflow-x-auto m-5">
                 <table className="table">
                   {/* head */}

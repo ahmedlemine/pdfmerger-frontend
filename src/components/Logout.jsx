@@ -7,17 +7,18 @@ import { toast } from 'react-toastify';
 
 function Logout() {
 
-  const { setIsLoggedIn, setUser } = useContext(CurrentUserContext)
+  const { setIsLoggedIn, user, setUser } = useContext(CurrentUserContext)
 
   const navigate = useNavigate()
 
   const logOut = () => {
+    setUser({})
     Cookies.remove('access_token')
     Cookies.remove('refresh_token')
     setIsLoggedIn(false)
-    setUser({})
+    
     // toast.success("Logged out successfully")
-    navigate("/login")
+    // navigate("/login")
   }
 
 
@@ -25,7 +26,7 @@ function Logout() {
   return (
       <div className="flex items-center justify-center">
 
-        <div className="card bg-base-100 w-96 shadow-xl">
+        <div className="card w-96 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Logout</h2>
             <p>Logout of the app?</p>

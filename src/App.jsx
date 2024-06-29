@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Cookies from 'js-cookie';
+// import { jwtDecode } from 'jwt-decode';
 
 import './App.css'
 import mergerAxios from '../axios';
@@ -20,39 +21,74 @@ import Signup from './components/Signup';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(Cookies.get('access_token') ? true : false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState({}) // set initial value to {}. If set to null or not set, will throw error that user is null/undefined
+  const [forceRender, setForceRender] = useState(false) // dummy state. temp for debug
 
 
   useEffect(() => {
     const getUser = async () => {
-      try {
-        const res = await mergerAxios.get('/auth/users/me/')
-        setUser(res.data)
-
-      } catch (error) {
-        if (error.response.status === 401) {
-          console.error(error)
-          // console.error(error.response.data.detail)
-          setUser({})
-          setIsLoggedIn(false)
-        } else {
-          console.error(error)
-          setUser({})
-          setIsLoggedIn(false)
+      let config = {
+        method: 'get',
+        headers: {
+          "Authorization": "Bearer " + Cookies.get('access_token'),
+          "content-type": "application/json"
         }
       }
-      return () => {
-        setUser({})
+      try {
+        const res = await fetch('http://localhost:8000/api/v1/auth/users/me/', config)
+        if (!res.ok) {
+          throw new Error(`Response status: ${res.status}`);
+        }
+        const data = await res.json()
+      console.log("data from fetch inside useEffect in app: ", data)
+
+        console.log(data)
+        setUser(data)
+      } catch (error) {
+        console.error("Fetch error: ", error.message);
       }
+      // setForceRender(v => !v)
+      // const accessToken = Cookies.get('access_token')
+
+      // try {
+
+      //   const url = 'http://localhost:8000/api/v1/auth/users/me/'
+      //   const res = await mergerAxios.get(url, {cache: 'no-cache'})
+      //   console.log("res.data from axios inside useEffect in app: ", res.data)
+      //   setUser(res.data)
+      
+      // } catch (error) {
+      //   console.error(error)
+
+
+      // Don't use
+      // }
+      //   if(error.response.status === 401){
+      //     console.error(error)
+      //     // console.error(error.response.data.detail)
+      //     setUser({})
+      //     setIsLoggedIn(false)
+      //   } else {
+      //     console.error(error)
+      //     setUser({})
+      //     setIsLoggedIn(false)
+      //   }
+      // }
+
+      // return () => {
+      //   setUser({})
+      // }
 
     };
+    
     getUser()
-  }, [isLoggedIn])
+    
+  }, [isLoggedIn, setIsLoggedIn, setUser])
 
 
   return (
-    <CurrentUserContext.Provider value={{ isLoggedIn, setIsLoggedIn , user, setUser}}>
+    <CurrentUserContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser }}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainLayout />}>

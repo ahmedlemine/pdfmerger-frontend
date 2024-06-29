@@ -16,7 +16,11 @@ function NavBar() {
       <div className="flex-none">
         {isLoggedIn ? (
           <>
-            <div className='mr-1'>{user.name !== null ? user.name : ''}</div>
+            <div className='mr-1'>
+              <span>{user.name}---</span>
+              <Link to='/orders' className="btn btn-sm btn-primary mr-1">My merges</Link>
+              <Link to='/create' className="btn btn-sm btn-primary btn-outline ml-1">New</Link>
+            </div>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">

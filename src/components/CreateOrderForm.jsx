@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 
 import mergerAxios from '../../axios.js'
@@ -19,7 +18,6 @@ const CreateOrderForm = () => {
         const data = { name: orderName }
         const res = await mergerAxios.post('/orders/', data)
         const newOrder = res.data
-        toast.success("merge created!")   
         navigate(`/order/${newOrder.id}/`)
     }
 
@@ -32,7 +30,7 @@ const CreateOrderForm = () => {
 
     return (
         <div className="m-10">
-            <div className="mt-10 mb-10 p-10 bg-base-200 text-center place-items-center">
+            <div className="mt-10 mb-10 p-10 border-2 border-dashed text-center place-items-center">
                 <h2 className='mb-2'>Create a new merge</h2>
                 
                 <form onSubmit={handleSubmit}>

@@ -4,10 +4,10 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-
 import { useNavigate } from 'react-router-dom';
 import { CurrentUserContext } from '../Context';
 
+import { isAccessTokenExpired } from '../utils/auth'
 import { baseURL } from '../../axios'
 
 const Login = () => {
@@ -25,31 +25,38 @@ const Login = () => {
     // 2- check coockies if there is a refresh token, if yes use it to get new access token, if not =>
     // 3- use email/password to create a new set of tokens: access & refresh
 
-    const doLogin = async (user) => {
-        const refreshToken = Cookies.get('refresh_token')
-        if (!refreshToken || refreshToken === 'undefined') {
-            return createNewToken(user)
+    const doLogin = (user) => {
+        const accessToken = Cookies.get('access_token')
+        if (isAccessTokenExpired(accessToken) || !accessToken || accessToken === 'undefined') {
+            refreshAccess(user)
         }
-
-        refreshAccess(refreshToken)
+        setUser({})
         getUser()
-        
+
         setIsLoggedIn(true)
-        
-        toast.success("Logged in successfully!")
+
+        // toast.success("Logged in successfully!")
         navigate('/', { replace: true })
     }
 
-    const refreshAccess = async (refreshToken) => {
-        const payload = { refresh: refreshToken }
+    const refreshAccess = async (user) => {
 
-        try {
-            const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
-            Cookies.set('access_token', data.access);
-            return data.access
-        }
-        catch (error) {
-            setErrorMessage(error.message)
+        const refreshToken = Cookies.get('refresh_token')
+
+        if (isAccessTokenExpired(refreshToken) || !refreshToken || refreshToken === 'undefined') {
+            return createNewToken(user)
+        } else {
+            const payload = { refresh: refreshToken }
+
+            try {
+                const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
+                Cookies.set('access_token', data.access);
+                return data.access
+            }
+            catch (error) {
+                setErrorMessage(error.message)
+            }
+
         }
     }
 
@@ -83,21 +90,26 @@ const Login = () => {
 
     const getUser = async () => {
         try {
-          const res = await mergerAxios.get('/auth/users/me/')
-          console.log(res.data)
-          setUser(res.data)
-  
+            const url = 'auth/users/me/'
+            const res = await axios.get(`${url}?cb=${Date.now()}`)
+            console.log("res.data from getUser inside Login: ", res.data)
+            setUser(res.data)
+            // if (res.status === 200) {
+            // }
+
         } catch (error) {
-          if (error.response.status === 401) {
-            console.error(error)
-  
-            setIsLoggedIn(false)
-          } else {
-            console.error(error)
-          }
+            console.log(error)
         }
-  
-      };
+            // if (error.response.status === 401) {
+            //     console.error(error)
+
+            //     setIsLoggedIn(false)
+            // } else {
+            //     console.error(error)
+            // }
+        // }
+
+    };
 
 
     const onSubmit = async (e) => {
@@ -115,7 +127,7 @@ const Login = () => {
 
     return (
         <>
-            <div className="hero bg-base-200 min-h-screen">
+            <div className="hero min-h-screen">
                 <div className="hero-content flex-col lg:flex-row-reverse">
                     <div className="text-center lg:text-left">
                         <h1 className="text-5xl font-bold">Login</h1>
