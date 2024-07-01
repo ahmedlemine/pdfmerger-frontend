@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-export const baseURL = 'http://localhost:8000/api/v1/';
+export const baseURL = 'http://192.168.10.71:8000/api/v1/';
 
 const mergerAxios = axios.create({
 	baseURL: baseURL,
@@ -18,23 +18,5 @@ const mergerAxios = axios.create({
 	},
 });
 
-const fileUploaderAxios = axios.create({
-	baseURL: baseURL,
-	// method: 'post',
-	timeout: 5000,
-	headers: {
-		Authorization: Cookies.get('access_token')
-			? 'Bearer ' + Cookies.get('access_token')
-			: null,
-		'Content-Type': 'multipart/form-data',
-		accept: 'application/json',
-		// withCredentials: true
-	},
-});
 
-
-export {
-	mergerAxios,
-	fileUploaderAxios
-}
 export default mergerAxios;

@@ -1,8 +1,7 @@
-// import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaExclamationTriangle } from 'react-icons/fa';
 
-export default function ErrorPage() {
+const ErrorPage = () => {
   return (
     <section className='text-center flex flex-col justify-center items-center h-96'>
       <FaExclamationTriangle className='text-yellow-400 text-6xl mb-4' />
@@ -17,3 +16,5 @@ export default function ErrorPage() {
     </section>
   );
 }
+
+export default ErrorPage;

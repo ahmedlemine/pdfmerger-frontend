@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import CurrentUserContext from '../Context';
 
-function NavBar() {
+const NavBar = () => {
 
   const { isLoggedIn, user } = useContext(CurrentUserContext)
 
@@ -17,9 +17,9 @@ function NavBar() {
         {isLoggedIn ? (
           <>
             <div className='mr-1'>
-              <span>{user.name}</span>
               <Link to='/orders' className="btn btn-sm btn-primary mr-1">My merges</Link>
               <Link to='/create' className="btn btn-sm btn-primary btn-outline ml-1">New</Link>
+              <span className='mr-1 ml-2'>{user.name}</span>
             </div>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">

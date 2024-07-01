@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import CurrentUserContext from '../Context';
 
 
-function Hero() {
+const Hero = () => {
     const { isLoggedIn } = useContext(CurrentUserContext)
 
 
