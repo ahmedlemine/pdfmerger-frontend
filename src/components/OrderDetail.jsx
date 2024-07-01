@@ -5,9 +5,10 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
 import mergerAxios, { baseURL } from "../../axios";
-
 import FileCard from "./FileCard";
 import FileForm from "./FileForm";
+
+
 
 const baseDownloadURL = "http://localhost:8000/";
 
@@ -68,6 +69,7 @@ const OrderDetail = () => {
     const [loading, setLoading] = useState(true);
     const [downloadUrl, setDownloadUrl] = useState();
     const [showApiError, setShowApiError] = useState(false);
+    const [uploadError, setUploadError] = useState('')
 
     const {
         showAddFileBtn,
@@ -89,6 +91,7 @@ const OrderDetail = () => {
 
     useEffect(() => {
         fetchOrder();
+        setLoading(false)
     }, []);
 
     useEffect(() => {
@@ -110,6 +113,8 @@ const OrderDetail = () => {
 
     const fetchOrder = async () => {
         try {
+            setApiError('')
+
             const { data } = await axios.get(
                 `${baseURL}orders/${id}/`,
                 axiosConfig
@@ -126,38 +131,39 @@ const OrderDetail = () => {
             }
         } catch (error) {
             setShowApiError(true);
-            if (error.response.status === 404) {
+            if (error?.response?.status === 404) {
                 setApiError("No order found with this ID.");
             } else {
-                setApiError(error);
-
+                setApiError("Error: unable to fetch data from API");
                 throw new Error(error);
-                console.error(error);
             }
         }
     };
 
     const fetchFiles = async () => {
         try {
-            const { data } = await mergerAxios.get(
+            setApiError('')
+            const { data } = await axios.get(
                 `${baseURL}orders/${id}/files/`,
                 axiosConfig
             );
             setFiles(data);
         } catch (error) {
             setShowApiError(true);
-            if (error.response.status === 404) {
+            if (error?.response?.status === 404) {
                 setApiError("No order found with this ID.");
             } else {
-                setApiError(error);
-                console.error(error);
+                setApiError("Error: unable to fetch data from API");
+                throw new Error(error);
             }
         }
     };
 
     const deleteFile = async (id) => {
         try {
-            await mergerAxios.delete(
+            setApiError('')
+            setShowApiError(false)
+            await axios.delete(
                 `${baseURL}files/${id}/delete/`,
                 axiosConfig
             );
@@ -169,7 +175,7 @@ const OrderDetail = () => {
             }
         } catch (error) {
             setShowApiError(true);
-            if (error.response.status === 404) {
+            if (error.response?.status === 404) {
                 setApiError("file doesn't exist.");
             } else {
                 console.error(error);
@@ -179,6 +185,9 @@ const OrderDetail = () => {
 
     const uploadFile = async (pdf, orderId) => {
         try {
+            setLoading(true)
+            setUploadError('')
+            setShowApiError(false);
             const newFile = await axios({
                 method: "post",
                 url: `${baseURL}orders/${orderId}/add_files/`,
@@ -191,8 +200,10 @@ const OrderDetail = () => {
                 },
             });
 
-            setFiles([...files, newFile]);
+            setLoading(false)
 
+            setFiles([...files, newFile]);
+            
             fetchFiles();
 
             if (files.length >= 2) {
@@ -203,28 +214,29 @@ const OrderDetail = () => {
                 dispatch({ mode: "FIVE FILES" });
             }
         } catch (error) {
-            setShowApiError(true);
-            setApiError("");
+            setUploadError("");
             if (error.response) {
-                if (error.response.status === 400) {
-                    console.log(error.response.data.detail);
-                    setApiError(
+                if (error?.response?.status === 400) {
+                    // console.log(error?.response?.data.detail);
+                    setUploadError(
                         error.response.data.error || error.response.data.file
                     );
                 } else if (error.response.status === 401) {
-                    setApiError(
+                    setUploadError(
                         "Not authorized. Please check you're logged in."
                     );
                     console.error(error.response.data.detail);
                 } else if (error.response.status === 403) {
-                    setApiError(error.response.data.detail);
+                    setUploadError(error.response.data.detail);
                     console.error(error.response.data.detail);
                 }
             } else if (error.request) {
-                setApiError(error.request);
+                setUploadError(error.request);
             } else {
-                setApiError(error.message);
+                setUploadError(error.message);
             }
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -238,6 +250,7 @@ const OrderDetail = () => {
         }
 
         try {
+            setApiError('')
             setShowApiError(false);
             setShowFileForm(false);
             await axios.get(`${baseURL}orders/${orderId}/merge/`, axiosConfig);
@@ -255,6 +268,7 @@ const OrderDetail = () => {
 
     const downloadOrder = async (orderId) => {
         setShowApiError(false);
+        setApiError('')
 
         await axios
             .get(`orders/${orderId}/download/`, axiosConfig)
@@ -382,6 +396,9 @@ const OrderDetail = () => {
                     uploadFile={uploadFile}
                     order={order}
                     apiError={apiError}
+                    loading={loading}
+                    uploadError={uploadError}
+                    setUploadError={setUploadError}
                 />
             )}
         </>

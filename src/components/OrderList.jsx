@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { FaCheckCircle, FaPen, FaTimes, FaTrash } from "react-icons/fa";
 import { baseURL } from "../../axios";
 
-
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -91,7 +90,9 @@ const OrderList = () => {
     return (
         <>
             {loading ? (
-                <div className="loading loading-spinner loading-lg"></div>
+                <div className="flex place-content-center mt-2 mb-2">
+                    <div className="loading loading-spinner loading-lg"></div>
+                </div>
             ) : (
                 <>
                     {showApiError && (
@@ -201,6 +202,6 @@ const OrderList = () => {
             )}
         </>
     );
-}
+};
 
 export default OrderList;
