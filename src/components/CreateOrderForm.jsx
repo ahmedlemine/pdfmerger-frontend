@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
-import mergerAxios, { baseURL } from "../../axios.js";
+import mergerAxios, { baseURL } from "../utils/axios.js";
 
 const CreateOrderForm = () => {
     const [orderName, setOrderName] = useState();
@@ -57,6 +57,7 @@ const CreateOrderForm = () => {
                             className="input input-bordered input-neutral w-full max-w-xs"
                             onChange={(e) => setOrderName(e.target.value)}
                             required
+                            maxLength="50"
                         />
                     </div>
                     <div>

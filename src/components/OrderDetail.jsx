@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useReducer } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useState, useEffect, useReducer } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
-import mergerAxios, { baseURL } from "../../axios";
+import mergerAxios, { baseURL } from "../utils/axios.js";
 import FileCard from "./FileCard";
 import FileForm from "./FileForm";
 

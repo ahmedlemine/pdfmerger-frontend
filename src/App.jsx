@@ -1,16 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-    BrowserRouter,
-    Routes,
-    Route,
-    useLocation,
-    useNavigate,
-} from "react-router-dom";
+import { useEffect, useContext } from "react";
+import { Routes, Route } from "react-router-dom";
 import Cookies from "js-cookie";
 
 import "./App.css";
 import CurrentUserContext from "./Context";
-import { isAccessTokenExpired } from "./utils/auth";
 
 import MainLayout from "./layouts/MainLayout";
 import ErrorPage from "./components/ErrorPage";

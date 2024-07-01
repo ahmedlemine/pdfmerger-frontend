@@ -4,7 +4,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { FaCheckCircle, FaPen, FaTimes, FaTrash } from "react-icons/fa";
-import { baseURL } from "../../axios";
+import { baseURL } from "../utils/axios.js";
+
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
