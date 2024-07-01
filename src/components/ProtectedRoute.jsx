@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { useContext } from 'react';
-import { CurrentUserContext } from '../Context';
+import CurrentUserContext from '../Context';
 import { Navigate } from 'react-router-dom';
 
 

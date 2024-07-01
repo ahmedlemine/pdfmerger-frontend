@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 
 import { useNavigate } from 'react-router-dom';
-import { CurrentUserContext } from '../Context';
+import CurrentUserContext from '../Context';
 
 import { baseURL } from '../../axios'
 
@@ -16,31 +16,31 @@ const Signup = () => {
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
-    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(CurrentUserContext)
+    const { isLoggedIn, setUser } = useContext(CurrentUserContext)
 
     const navigate = useNavigate();
 
     const doSignup = async (newUser) => {
-        // flush existing tokens from cookies and set privious user to {}.
         setUser({})
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
 
         try {
-            await axios.post("http://localhost:8000/api/v1/auth/users/", newUser)
+            await axios.post(baseURL + "auth/users/", newUser)
             toast.success("Successfully signed up. Please login now.")
             navigate('/login')
 
-        }
-        catch (error) {
-            if (error.response) {
-                if (error.response.status === 401) {
-                    console.log(error.response.data.detail)
-                    setErrorMessage(error.response.data.detail)
+        } catch (error) {
+            if (error?.response) {
+                console.log(error.message)
+
+                if (error.response.status === 400) {
+                    console.log(error.response.data)
+                    // setErrorMessage(error.response.data)
                 }
             } else {
-                console.log(error)
-                setErrorMessage(error.message)
+                // console.log(error)
+                setErrorMessage(error?.message)
             }
 
         }
@@ -104,7 +104,7 @@ const Signup = () => {
                                 </label>
                             </div>
                             <div className="form-control mt-6">
-                                <button className="btn btn-primary">Login</button>
+                                <button className="btn btn-primary">Sign Up</button>
                             </div>
                             {errorMessage &&
                                 <p className='text-red-600'>Erorr: {errorMessage}</p>

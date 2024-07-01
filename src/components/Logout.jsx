@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
-import { CurrentUserContext } from '../Context';
+import CurrentUserContext from '../Context';
 import { toast } from 'react-toastify';
 
 function Logout() {
@@ -12,13 +12,14 @@ function Logout() {
   const navigate = useNavigate()
 
   const logOut = () => {
-    setUser({})
+    
     Cookies.remove('access_token')
     Cookies.remove('refresh_token')
+
     setIsLoggedIn(false)
     
     // toast.success("Logged out successfully")
-    // navigate("/login")
+    navigate("/login")
   }
 
 

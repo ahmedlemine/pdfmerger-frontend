@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import { useNavigate } from 'react-router-dom';
-import { CurrentUserContext } from '../Context';
+import CurrentUserContext from '../Context';
 
 import { isAccessTokenExpired } from '../utils/auth'
 import { baseURL } from '../../axios'
@@ -15,7 +15,7 @@ const Login = () => {
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
-    const { isLoggedIn, setIsLoggedIn, setUser } = useContext(CurrentUserContext)
+    const { isLoggedIn, setIsLoggedIn, user, setUser, setAccessToken } = useContext(CurrentUserContext)
 
     const navigate = useNavigate();
 
@@ -25,100 +25,81 @@ const Login = () => {
     // 2- check coockies if there is a refresh token, if yes use it to get new access token, if not =>
     // 3- use email/password to create a new set of tokens: access & refresh
 
-    const doLogin = (user) => {
+    const doLogin = async (userLogin) => {
         const accessToken = Cookies.get('access_token')
+
         if (isAccessTokenExpired(accessToken) || !accessToken || accessToken === 'undefined') {
-            refreshAccess(user)
-        }
-        setUser({})
-        getUser()
+            const refreshToken = Cookies.get('refresh_token')
 
-        setIsLoggedIn(true)
+            if (refreshToken !== null && refreshToken !== 'undefined' && !isAccessTokenExpired(refreshToken)) {
+                const payload = { refresh: refreshToken }
+                try { // refresh access token
+                    const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
+                    // console.log("refreshed accessToken")
+                    Cookies.set('access_token', data.access);
+                }
+                catch (error) {
+                    console.log(`Error refreshing token: ${error.message}`)
 
-        // toast.success("Logged in successfully!")
-        navigate('/', { replace: true })
-    }
+                    setErrorMessage(`Error refreshing token: ${error.message}`)
+                }
+            }
 
-    const refreshAccess = async (user) => {
+            try { // create new access token
+                const { data } = await axios.post(baseURL + "auth/jwt/create/", userLogin)
+                Cookies.set('access_token', data.access, { secure: true });
+                Cookies.set('refresh_token', data.refresh);
 
-        const refreshToken = Cookies.get('refresh_token')
+                setAccessToken(data.access)
+                // setIsLoggedIn(true)
 
-        if (isAccessTokenExpired(refreshToken) || !refreshToken || refreshToken === 'undefined') {
-            return createNewToken(user)
-        } else {
-            const payload = { refresh: refreshToken }
-
-            try {
-                const { data } = await axios.post(baseURL + "auth/jwt/refresh/", payload)
-                Cookies.set('access_token', data.access);
-                return data.access
             }
             catch (error) {
-                setErrorMessage(error.message)
-            }
-
-        }
-    }
-
-
-    const createNewToken = async (user) => {
-        try {
-            const { data } = await axios.post("http://localhost:8000/api/v1/auth/jwt/create/", user)
-            Cookies.set('access_token', data.access);
-            Cookies.set('refresh_token', data.refresh);
-            setIsLoggedIn(true)
-            navigate('/')
-
-
-            return data.access
-        }
-        catch (error) {
-            if (error.response) {
-                if (error.response.status === 401) {
-                    console.log(error.response.data.detail)
-                    setErrorMessage(error.response.data.detail)
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        console.log(`Error creating new tokens ${error.response.data.detail}`)
+                        setErrorMessage(error.response.data.detail)
+                    }
+                } else {
+                    console.log(error)
+                    setErrorMessage(error.message)
                 }
-            } else {
-                console.log(error)
-                setErrorMessage(error.message)
+
             }
-
         }
-    }
 
 
-
-    const getUser = async () => {
         try {
-            const url = 'auth/users/me/'
-            const res = await axios.get(`${url}?cb=${Date.now()}`)
-            console.log("res.data from getUser inside Login: ", res.data)
+            const res = await axios.get(baseURL + 'auth/users/me/', {
+                headers: {
+                    Authorization: 'Bearer ' + Cookies.get('access_token')
+                },
+            })
+            // console.log("res.data from getUser inside Login: ", res.data)
             setUser(res.data)
-            // if (res.status === 200) {
-            // }
+            // console.log("from login: ", user)
+            if (res.status === 200) {
+                setIsLoggedIn(true)
+                // toast.success("Logged in successfully!")
+                navigate('/')
+            }
 
         } catch (error) {
-            console.log(error)
+            console.log("Error fetching user: ", error)
+
         }
-            // if (error.response.status === 401) {
-            //     console.error(error)
 
-            //     setIsLoggedIn(false)
-            // } else {
-            //     console.error(error)
-            // }
-        // }
+    }
 
-    };
 
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        const user = {
+        const userLogin = {
             email: email,
             password: password
         }
-        doLogin(user)
+        doLogin(userLogin)
     }
 
     if (isLoggedIn) {

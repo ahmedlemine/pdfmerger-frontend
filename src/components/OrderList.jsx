@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import { FaCheckCircle, FaPen, FaTimes, FaTrash } from 'react-icons/fa';
 import mergerAxios from '../../axios'
+import { baseURL } from '../../axios'
 
 
 function OrderList() {
@@ -16,7 +18,13 @@ function OrderList() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await mergerAxios.get("/orders/")
+      const res = await axios.get(baseURL + "orders/",{
+        headers: {
+            Authorization: 'Bearer ' + Cookies.get('access_token'),
+            'Content-Type': 'application/json',
+            accept: 'application/json',
+        },
+    } )
       setOrders(res.data)
       setLoading(false)
     }
@@ -25,10 +33,8 @@ function OrderList() {
   }, [])
 
 
-
-
   const deleteOrder = async (id) => {
-    await mergerAxios.delete(`/orders/${id}`)
+    await mergerAxios.delete(`/orders/${id}/`, )
     setOrders(orders.filter((order) => order.id !== id))
     toast.success("Merge deleted!")
   }

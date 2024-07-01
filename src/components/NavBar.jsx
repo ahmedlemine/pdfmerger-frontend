@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
-import { CurrentUserContext } from '../Context';
+import CurrentUserContext from '../Context';
 
 function NavBar() {
 
-  const { isLoggedIn, user, setUser } = useContext(CurrentUserContext)
+  const { isLoggedIn, user } = useContext(CurrentUserContext)
 
 
   return (
@@ -17,7 +17,7 @@ function NavBar() {
         {isLoggedIn ? (
           <>
             <div className='mr-1'>
-              <span>{user.name}---</span>
+              <span>{user.name}</span>
               <Link to='/orders' className="btn btn-sm btn-primary mr-1">My merges</Link>
               <Link to='/create' className="btn btn-sm btn-primary btn-outline ml-1">New</Link>
             </div>
