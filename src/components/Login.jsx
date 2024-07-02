@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CurrentUserContext from "../Context";
 
 import { isAccessTokenExpired } from "../utils/auth";
@@ -18,7 +18,11 @@ const Login = () => {
     const { isLoggedIn, setIsLoggedIn, user, setUser, setAccessToken } =
         useContext(CurrentUserContext);
 
+    
     const navigate = useNavigate();
+    const location = useLocation();
+    const next = location.state?.from?.pathname || "/";
+
 
     const doLogin = async (userLogin) => {
         const accessToken = Cookies.get("access_token");
@@ -88,7 +92,7 @@ const Login = () => {
             if (res.status === 200) {
                 setIsLoggedIn(true);
                 toast.success("Logged in successfully!");
-                navigate("/");
+                navigate(next, { replace: true });
             }
         } catch (error) {
             console.log("Error fetching user: ", error);

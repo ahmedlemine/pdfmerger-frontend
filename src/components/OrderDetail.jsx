@@ -169,7 +169,7 @@ const OrderDetail = () => {
             );
             setFiles(files.filter((f) => f.id !== id));
             fetchFiles();
-            toast.success("file deleted!");
+            toast.success("file removed.");
             if (files.length < 2) {
                 dispatch({ mode: "FILES NOT ENOUGH" });
             }
