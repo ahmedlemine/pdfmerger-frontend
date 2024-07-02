@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
@@ -21,6 +21,30 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const next = location.state?.from?.pathname || "/";
+
+    useEffect(() => {
+        const attemptRefresh = async () => {
+            const refreshToken = Cookies.get("refresh_token");
+
+            if (
+                refreshToken !== null &&
+                refreshToken !== "undefined" &&
+                !isAccessTokenExpired(refreshToken)
+            ) {
+                const payload = { refresh: refreshToken };
+                const { data } = await axios.post(
+                    baseURL + "auth/jwt/refresh/",
+                    payload
+                );
+
+                Cookies.set("access_token", data.access);
+                setIsLoggedIn(true);
+                toast.success("Refreshed login.")
+                navigate(next, { replace: true });
+            }
+        };
+        attemptRefresh();
+    }, []);
 
     const doLogin = async (userLogin) => {
         const accessToken = Cookies.get("access_token");
@@ -75,8 +99,6 @@ const Login = () => {
             );
             Cookies.set("access_token", data.access, { secure: true });
             Cookies.set("refresh_token", data.refresh);
-
-            setAccessToken(data.access);
 
             // return data.access;
         } catch (error) {

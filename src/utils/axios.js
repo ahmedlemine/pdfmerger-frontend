@@ -7,15 +7,14 @@ const mergerAxios = axios.create({
 	baseURL: baseURL,
 	timeout: 5000,
 	headers: {
-		// Authorization: Cookies.get('access_token')
-		// 	? 'Bearer ' + Cookies.get('access_token')
-		// 	: null,
+		Authorization: 'Bearer ' + Cookies.get('access_token'),
 		'Content-Type': 'application/json',
 		accept: 'application/json',
 		// 'Cache-Control': 'no-cache',
 		// 'Pragma': 'no-cache'
-		withCredentials: true
+		
 	},
+	withCredentials: true
 });
 
 
