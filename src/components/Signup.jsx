@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CurrentUserContext from "../Context";
 
 import { baseURL } from "../utils/axios.js";
+import { FaTimes } from "react-icons/fa";
 
 const Signup = () => {
     const [name, setName] = useState("");
@@ -30,25 +31,9 @@ const Signup = () => {
             navigate("/login");
         } catch (error) {
             if (error?.response) {
-                if (error.response.status === 400) {
-                    let errorOjbect = error.response.data;
-                    let emailError;
-                    let nameError;
-                    let passwordError;
-
-                    errorOjbect.email
-                        ? (emailError = `Email: ${errorOjbect.email}`)
-                        : (emailError = "");
-                    errorOjbect.name
-                        ? (nameError = `Name: ${errorOjbect.name}`)
-                        : (nameError = "");
-                    errorOjbect.password
-                        ? (passwordError = `Password: ${errorOjbect.password}`)
-                        : (passwordError = "");
-
-                    let errorList = Array(emailError, nameError, passwordError);
-                    console.log(error.response.data);
-                    setErrorMessage(errorList);
+                if (error?.response?.status === 400) {
+                    const errorObject = error.response.data;
+                    setErrorMessage(errorObject);
                 }
             } else {
                 console.log(error);
@@ -131,10 +116,18 @@ const Signup = () => {
                                 </button>
                             </div>
                             {errorMessage && (
-                                <ul className="text-red-600 list-none">
-                                    {errorMessage.map((item, index) => (
-                                        <li key={index}>{item}</li>
-                                    ))}
+                                <ul className="list-desc">
+                                    {Object.entries(errorMessage).map(
+                                        ([key, field]) => (
+                                            <li key={key}>
+                                                {key.toUpperCase()}: <ol className="text-red-600 list">{field.map(err => (
+                                                     <li key={err}>- {err}</li>
+                                                     
+                                                ))}
+                                                </ol>
+                                            </li>
+                                        )
+                                    )}
                                 </ul>
                             )}
                         </form>
