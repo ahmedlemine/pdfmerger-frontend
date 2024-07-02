@@ -4,7 +4,7 @@ import CurrentUserContext from '../Context';
 
 const NavBar = () => {
 
-  const { isLoggedIn, user } = useContext(CurrentUserContext)
+  const { isLoggedIn } = useContext(CurrentUserContext)
 
 
   return (
@@ -18,14 +18,12 @@ const NavBar = () => {
             <div className='mr-1'>
               <Link to='/orders' className="btn btn-sm btn-primary mr-1">My merges</Link>
               <Link to='/create' className="btn btn-sm btn-primary btn-outline ml-1">New</Link>
-              <span className='mr-1 ml-2'>{user.name}</span>
+              {/* <span className='mr-1 ml-2'>{user?.name ? user.name : ''} </span> */}
             </div>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
-                  <img
-                    alt={user.name}
-                    src="/src/assets/avatar.jpg" />
+                  <img src="/src/assets/avatar.jpg" />
                 </div>
               </div>
               <ul

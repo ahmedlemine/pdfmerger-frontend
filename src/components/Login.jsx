@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
+
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -15,14 +16,11 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState(null);
 
-    const { isLoggedIn, setIsLoggedIn, user, setUser, setAccessToken } =
-        useContext(CurrentUserContext);
+    const { isLoggedIn, setIsLoggedIn } = useContext(CurrentUserContext);
 
-    
     const navigate = useNavigate();
     const location = useLocation();
     const next = location.state?.from?.pathname || "/";
-
 
     const doLogin = async (userLogin) => {
         const accessToken = Cookies.get("access_token");
@@ -32,72 +30,88 @@ const Login = () => {
             !accessToken ||
             accessToken === "undefined"
         ) {
-            const refreshToken = Cookies.get("refresh_token");
-
-            if (
-                refreshToken !== null &&
-                refreshToken !== "undefined" &&
-                !isAccessTokenExpired(refreshToken)
-            ) {
-                const payload = { refresh: refreshToken };
-                try {
-                    // refresh access token
-                    const { data } = await axios.post(
-                        baseURL + "auth/jwt/refresh/",
-                        payload
-                    );
-                    Cookies.set("access_token", data.access);
-                } catch (error) {
-                    console.log(`Error refreshing token: ${error.message}`);
-
-                    setErrorMessage(`Error refreshing token: ${error.message}`);
-                }
-            }
-
-            try {
-                // create new access token
-                const { data } = await axios.post(
-                    baseURL + "auth/jwt/create/",
-                    userLogin
-                );
-                Cookies.set("access_token", data.access, { secure: true });
-                Cookies.set("refresh_token", data.refresh);
-
-                setAccessToken(data.access);
-                // setIsLoggedIn(true)
-            } catch (error) {
-                if (error.response) {
-                    if (error.response.status === 401) {
-                        console.log(
-                            `Error creating new tokens ${error.response.data.detail}`
-                        );
-                        setErrorMessage(error.response.data.detail);
-                    }
-                } else {
-                    console.log(error);
-                    setErrorMessage(error.message);
-                }
-            }
+            refreshAccessToken(userLogin);
         }
 
-        try {
-            const res = await axios.get(baseURL + "auth/users/me/", {
-                headers: {
-                    Authorization: "Bearer " + Cookies.get("access_token"),
-                },
-            });
+        setIsLoggedIn(true);
+        toast.success("Logged in successfully!");
+        navigate(next, { replace: true });
+    };
 
-            setUser(res.data);
+    const refreshAccessToken = async (userLogin) => {
+        const refreshToken = Cookies.get("refresh_token");
 
-            if (res.status === 200) {
+        if (
+            refreshToken !== null &&
+            refreshToken !== "undefined" &&
+            !isAccessTokenExpired(refreshToken)
+        ) {
+            const payload = { refresh: refreshToken };
+            try {
+                // refresh access token
+                const { data } = await axios.post(
+                    baseURL + "auth/jwt/refresh/",
+                    payload
+                );
+
+                Cookies.set("access_token", data.access);
                 setIsLoggedIn(true);
-                toast.success("Logged in successfully!");
-                navigate(next, { replace: true });
+                // return data.access;
+            } catch (error) {
+                console.log(`Error refreshing token: ${error.message}`);
+
+                setErrorMessage(`Error refreshing token: ${error.message}`);
             }
-        } catch (error) {
-            console.log("Error fetching user: ", error);
+        } else {
+            createNewTokens(userLogin);
         }
     };
+
+    const createNewTokens = async (userLogin) => {
+        try {
+            const { data } = await axios.post(
+                baseURL + "auth/jwt/create/",
+                userLogin
+            );
+            Cookies.set("access_token", data.access, { secure: true });
+            Cookies.set("refresh_token", data.refresh);
+
+            setAccessToken(data.access);
+
+            // return data.access;
+        } catch (error) {
+            if (error.response) {
+                if (error.response.status === 401) {
+                    console.log(
+                        `Error creating new tokens ${error.response.data.detail}`
+                    );
+                    setErrorMessage(error.response.data.detail);
+                }
+            } else {
+                console.log(error);
+                setErrorMessage(error.message);
+            }
+        }
+    };
+
+    // const fetchUser = async (accessToken) => {
+    //     try {
+    //         const res = await axios.get(baseURL + "auth/users/me/", {
+    //             headers: {
+    //                 Authorization: "Bearer " + accessToken,
+    //             },
+    //         });
+
+    //         if (res.status === 200) {
+    //             setUser(res.data);
+    //             // setIsLoggedIn(true);
+    //             // toast.success("Logged in successfully!");
+    //             // navigate(next, { replace: true });
+    //         }
+    //     } catch (error) {
+    //         console.log("Error fetching user");
+    //     }
+    // };
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -182,4 +196,5 @@ const Login = () => {
         </>
     );
 };
+
 export default Login;

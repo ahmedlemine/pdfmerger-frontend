@@ -6,7 +6,7 @@ import CurrentUserContext from "../Context";
 import { toast } from "react-toastify";
 
 const Logout = () => {
-    const { setIsLoggedIn, setUser, setAccessToken } =
+    const { setIsLoggedIn, setUser } =
         useContext(CurrentUserContext);
 
     const navigate = useNavigate();
@@ -14,7 +14,6 @@ const Logout = () => {
     const logOut = () => {
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
-        setAccessToken(null);
         setUser({});
         setIsLoggedIn(false);
 

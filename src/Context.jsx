@@ -7,7 +7,6 @@ import { isAccessTokenExpired } from "./utils/auth";
 const accessTokenCookie = Cookies.get("access_token");
 
 export const CurrentUserProvider = ({ children }) => {
-    const [accessToken, setAccessToken] = useState(); // needed?
     const [isLoggedIn, setIsLoggedIn] = useState(
         !!accessTokenCookie && !isAccessTokenExpired(accessTokenCookie)
     );
@@ -20,8 +19,6 @@ export const CurrentUserProvider = ({ children }) => {
                 setIsLoggedIn,
                 user,
                 setUser,
-                accessToken,
-                setAccessToken,
             }}
         >
             {children}

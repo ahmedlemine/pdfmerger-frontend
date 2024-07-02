@@ -1,6 +1,5 @@
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 import { Routes, Route } from "react-router-dom";
-import Cookies from "js-cookie";
 
 import "./App.css";
 import CurrentUserContext from "./Context";
@@ -20,47 +19,6 @@ import Signup from "./components/Signup";
 function App() {
     const { isLoggedIn, setIsLoggedIn, user, setUser } =
         useContext(CurrentUserContext);
-    // const accessToken = Cookies.get('access_token')
-
-    // const navigate = useNavigate()
-    // const location = useLocation()
-
-    // // useEffect(() => {
-    // //   if (!accessToken || isAccessTokenExpired) {
-    // //     // navigate('/login', { state: { from: location } })
-    // //     console.log("no accessToken")
-    // //   }
-    // // }, [isLoggedIn])
-
-    useEffect(() => {
-        const getUser = async () => {
-            let config = {
-                method: "get",
-                headers: {
-                    Authorization: "Bearer " + Cookies.get("access_token"),
-                    "content-type": "application/json",
-                },
-            };
-            try {
-                const res = await fetch(
-                    "http://localhost:8000/api/v1/auth/users/me/",
-                    config
-                );
-                if (!res.ok) {
-                    throw new Error(`Response status: ${res.status}`);
-                }
-                const data = await res.json();
-                // console.log("data from fetch inside useEffect in conext: ", data)
-
-                // console.log(data)
-                setUser(data);
-            } catch (error) {
-                console.error("Fetch error: ", error.message);
-            }
-        };
-
-        getUser();
-    }, []);
 
     return (
         // <CurrentUserContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser }}>
