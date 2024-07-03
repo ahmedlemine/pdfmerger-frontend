@@ -1,4 +1,5 @@
 import React from 'react'
+import github_logo from './../assets/github_logo.png';
 
 const Footer = () => {
     return (
@@ -25,7 +26,7 @@ const Footer = () => {
             <nav>
                 <div className="grid grid-flow-col gap-4">
                     <a>
-                        <img width='25px' height='25px' src='/src/assets/github-logo.png'/>
+                        <img width='25px' height='25px' src={github_logo}/>
                     </a>
                     <a>
                         <svg

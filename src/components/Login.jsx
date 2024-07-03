@@ -37,7 +37,7 @@ const Login = () => {
                     payload
                 );
 
-                Cookies.set("access_token", data.access, { secure: true });
+                Cookies.set("access_token", data.access);
                 setIsLoggedIn(true);
                 toast.success("Refreshed login.");
                 navigate(next, { replace: true });
@@ -74,7 +74,7 @@ const Login = () => {
                     payload
                 );
 
-                Cookies.set("access_token", data.access, { secure: true });
+                Cookies.set("access_token", data.access);
                 setIsLoggedIn(true);
                 toast.success("Logged in successfully!");
                 navigate(next, { replace: true });
@@ -96,8 +96,8 @@ const Login = () => {
                 baseURL + "auth/jwt/create/",
                 credentials
             );
-            Cookies.set("access_token", data.access, { secure: true });
-            Cookies.set("refresh_token", data.refresh, { secure: true });
+            Cookies.set("access_token", data.access);
+            Cookies.set("refresh_token", data.refresh);
             setIsLoggedIn(true);
             toast.success("Logged in successfully!");
             navigate(next, { replace: true });

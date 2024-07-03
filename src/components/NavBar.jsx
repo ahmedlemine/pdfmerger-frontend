@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import CurrentUserContext from '../Context';
-
+import avatar from './../assets/avatar.jpg'
 const NavBar = () => {
 
   const { isLoggedIn } = useContext(CurrentUserContext)
@@ -23,7 +23,7 @@ const NavBar = () => {
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
-                  <img src="/src/assets/avatar.jpg" />
+                  <img src={avatar} />
                 </div>
               </div>
               <ul

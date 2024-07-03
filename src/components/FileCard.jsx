@@ -1,4 +1,5 @@
 import { FaXmark } from 'react-icons/fa6';
+import pdf from './../assets/pdf.png';
 
 function FileCard({file, deleteFile}) {
     return (
@@ -11,7 +12,7 @@ function FileCard({file, deleteFile}) {
                     </button>
                 </div>
                 <div className="w-20">
-                    <img alt="PDF file icon" src="/src/assets/pdf.png" width='20px' height='20px' />
+                    <img alt="PDF file icon" src={pdf} width='20px' height='20px' />
 
                 </div>
                 <span className='text-sm justify-self-end'>{file.original_name || 'untitled pdf'}</span>

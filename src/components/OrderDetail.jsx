@@ -4,13 +4,10 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
-import mergerAxios, { baseURL } from "../utils/axios.js";
+import mergerAxios, { HOST_URL, baseURL } from "../utils/axios.js";
 import FileCard from "./FileCard";
 import FileForm from "./FileForm";
 
-
-
-const baseDownloadURL = "http://localhost:8000/";
 
 const INITIAL_VIEW = {
     showAddFileBtn: false,
@@ -308,7 +305,7 @@ const OrderDetail = () => {
                         <a
                             role="button"
                             className="btn btn-outline btn-success"
-                            href={baseDownloadURL + order.download_url}
+                            href={HOST_URL + order.download_url}
                             target="_blank"
                         >
                             Download merged PDF
@@ -386,7 +383,7 @@ const OrderDetail = () => {
             </div>
             {showDownloadURL && (
                 <div className="alert link link-info">
-                    <a href={baseDownloadURL + downloadUrl}>
+                    <a href={HOST_URL + downloadUrl}>
                         Download merged PDF
                     </a>
                 </div>
