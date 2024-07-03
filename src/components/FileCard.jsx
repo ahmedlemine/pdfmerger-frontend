@@ -2,7 +2,7 @@ import { FaXmark } from 'react-icons/fa6';
 
 function FileCard({file, deleteFile}) {
     return (
-        <div key={file.id} className="card w-96 bg-base-100 shadow-xl m-3 " style={{display: 'inline-block'}}>
+        <div className="card w-96 bg-base-100 shadow-xl m-3 " style={{display: 'inline-block'}}>
             <div className="card-body">
                 <div className="card-actions justify-end">
 
