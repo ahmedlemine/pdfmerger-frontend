@@ -22,7 +22,7 @@ const INITIAL_VIEW = {
 
 const reducer = (viewState, { mode }) => {
     switch (mode) {
-        case "FILES NOT ENOUGH":
+        case "FILES_NOT_ENOUGH":
             return {
                 ...viewState,
                 showAddFileBtn: true,
@@ -30,9 +30,9 @@ const reducer = (viewState, { mode }) => {
                 showMergeBtn: false,
                 showDownloadBtn: false,
             };
-        case "ENOUGH FILES":
+        case "ENOUGH_FILES":
             return { ...viewState, showMergeBtn: true, showAddFileBtn: true };
-        case "FIVE FILES":
+        case "FIVE_FILES":
             return {
                 ...viewState,
                 showAddFileBtn: false,
@@ -100,13 +100,13 @@ const OrderDetail = () => {
 
     useEffect(() => {
         if (files.length < 2) {
-            dispatch({ mode: "FILES NOT ENOUGH" });
+            dispatch({ mode: "FILES_NOT_ENOUGH" });
         }
         if (files.length >= 2) {
-            dispatch({ mode: "ENOUGH FILES" });
+            dispatch({ mode: "ENOUGH_FILES" });
         }
         if (files.length > 4) {
-            dispatch({ mode: "FIVE FILES" });
+            dispatch({ mode: "FIVE_FILES" });
             setShowFileForm(false);
         }
     }, [files]);
@@ -125,9 +125,9 @@ const OrderDetail = () => {
             } else if (data.download_count > 0) {
                 dispatch({ mode: "DOWNLOADED" });
             } else if (data.pdf_files.length > 1) {
-                dispatch({ mode: "ENOUGH FILES" });
+                dispatch({ mode: "ENOUGH_FILES" });
             } else {
-                dispatch({ mode: "FILES NOT ENOUGH" });
+                dispatch({ mode: "FILES_NOT_ENOUGH" });
             }
         } catch (error) {
             setShowApiError(true);
@@ -171,7 +171,7 @@ const OrderDetail = () => {
             fetchFiles();
             toast.success("file removed.");
             if (files.length < 2) {
-                dispatch({ mode: "FILES NOT ENOUGH" });
+                dispatch({ mode: "FILES_NOT_ENOUGH" });
             }
         } catch (error) {
             setShowApiError(true);
@@ -207,11 +207,11 @@ const OrderDetail = () => {
             fetchFiles();
 
             if (files.length >= 2) {
-                dispatch({ mode: "ENOUGH FILES" });
+                dispatch({ mode: "ENOUGH_FILES" });
             }
             if (files.length > 4) {
                 setShowFileForm(false);
-                dispatch({ mode: "FIVE FILES" });
+                dispatch({ mode: "FIVE_FILES" });
             }
         } catch (error) {
             setUploadError("");

@@ -37,16 +37,16 @@ const Login = () => {
                     payload
                 );
 
-                Cookies.set("access_token", data.access);
+                Cookies.set("access_token", data.access, { secure: true });
                 setIsLoggedIn(true);
-                toast.success("Refreshed login.")
+                toast.success("Refreshed login.");
                 navigate(next, { replace: true });
             }
         };
         attemptRefresh();
     }, []);
 
-    const doLogin = async (userLogin) => {
+    const doLogin = async (credentials) => {
         const accessToken = Cookies.get("access_token");
 
         if (
@@ -54,15 +54,11 @@ const Login = () => {
             !accessToken ||
             accessToken === "undefined"
         ) {
-            refreshAccessToken(userLogin);
+            refreshAccessToken(credentials);
         }
-
-        setIsLoggedIn(true);
-        toast.success("Logged in successfully!");
-        navigate(next, { replace: true });
     };
 
-    const refreshAccessToken = async (userLogin) => {
+    const refreshAccessToken = async (credentials) => {
         const refreshToken = Cookies.get("refresh_token");
 
         if (
@@ -78,70 +74,51 @@ const Login = () => {
                     payload
                 );
 
-                Cookies.set("access_token", data.access);
+                Cookies.set("access_token", data.access, { secure: true });
                 setIsLoggedIn(true);
-                // return data.access;
+                toast.success("Logged in successfully!");
+                navigate(next, { replace: true });
+                
             } catch (error) {
                 console.log(`Error refreshing token: ${error.message}`);
 
                 setErrorMessage(`Error refreshing token: ${error.message}`);
+                return;
             }
         } else {
-            createNewTokens(userLogin);
+            createNewTokens(credentials);
         }
     };
 
-    const createNewTokens = async (userLogin) => {
+    const createNewTokens = async (credentials) => {
         try {
             const { data } = await axios.post(
                 baseURL + "auth/jwt/create/",
-                userLogin
+                credentials
             );
             Cookies.set("access_token", data.access, { secure: true });
-            Cookies.set("refresh_token", data.refresh);
-
-            // return data.access;
+            Cookies.set("refresh_token", data.refresh, { secure: true });
+            setIsLoggedIn(true);
+            toast.success("Logged in successfully!");
+            navigate(next, { replace: true });
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 401) {
-                    console.log(
-                        `Error creating new tokens ${error.response.data.detail}`
-                    );
                     setErrorMessage(error.response.data.detail);
                 }
             } else {
-                console.log(error);
                 setErrorMessage(error.message);
             }
         }
     };
 
-    // const fetchUser = async (accessToken) => {
-    //     try {
-    //         const res = await axios.get(baseURL + "auth/users/me/", {
-    //             headers: {
-    //                 Authorization: "Bearer " + accessToken,
-    //             },
-    //         });
-
-    //         if (res.status === 200) {
-    //             setUser(res.data);
-    //             // setIsLoggedIn(true);
-    //             // toast.success("Logged in successfully!");
-    //             // navigate(next, { replace: true });
-    //         }
-    //     } catch (error) {
-    //         console.log("Error fetching user");
-    //     }
-    // };
-
     const onSubmit = async (e) => {
         e.preventDefault();
-        const userLogin = {
+        const credentials = {
             email: email,
             password: password,
         };
-        doLogin(userLogin);
+        doLogin(credentials);
     };
 
     if (isLoggedIn) {
