@@ -36,7 +36,7 @@ const Signup = () => {
                     setErrorMessage(errorObject);
                 }
             } else {
-                console.log(error);
+                setApiError("Unexpected Error!");
             }
         }
     };
@@ -120,10 +120,13 @@ const Signup = () => {
                                     {Object.entries(errorMessage).map(
                                         ([key, field]) => (
                                             <li key={key}>
-                                                {key.toUpperCase()}: <ol className="text-red-600 list">{field.map(err => (
-                                                     <li key={err}>- {err}</li>
-                                                     
-                                                ))}
+                                                {key.toUpperCase()}:{" "}
+                                                <ol className="text-red-600 list">
+                                                    {field.map((err) => (
+                                                        <li key={err}>
+                                                            - {err}
+                                                        </li>
+                                                    ))}
                                                 </ol>
                                             </li>
                                         )

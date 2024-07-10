@@ -14,9 +14,6 @@ const mergerAxios = axios.create({
 		Authorization: 'Bearer ' + Cookies.get('access_token'),
 		'Content-Type': 'application/json',
 		accept: 'application/json',
-		// 'Cache-Control': 'no-cache',
-		// 'Pragma': 'no-cache'
-		
 	},
 	withCredentials: true
 });

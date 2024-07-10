@@ -80,8 +80,6 @@ const Login = () => {
                 navigate(next, { replace: true });
                 
             } catch (error) {
-                console.log(`Error refreshing token: ${error.message}`);
-
                 setErrorMessage(`Error refreshing token: ${error.message}`);
                 return;
             }

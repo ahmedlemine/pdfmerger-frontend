@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { FaCheckCircle, FaPen, FaTimes, FaTrash } from "react-icons/fa";
 import { baseURL } from "../utils/axios.js";
 
-
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,10 +36,8 @@ const OrderList = () => {
                         setApiError(
                             "Not authorized. Please check you're logged in."
                         );
-                        console.error(error.response.data.detail);
                     } else if (error.response.status === 403) {
                         setApiError(error.response.data.detail);
-                        console.error(error.response.data.detail);
                     }
                 } else if (error.request) {
                     setApiError(error.request);
@@ -67,7 +64,7 @@ const OrderList = () => {
                     "Not authorized. Please make sure you're logged in."
                 );
             } else {
-                console.error(error);
+                setApiError("Unexpected Error!");
             }
         }
     };

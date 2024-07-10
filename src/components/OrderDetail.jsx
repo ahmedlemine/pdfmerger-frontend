@@ -8,7 +8,6 @@ import mergerAxios, { HOST_URL, baseURL } from "../utils/axios.js";
 import FileCard from "./FileCard";
 import FileForm from "./FileForm";
 
-
 const INITIAL_VIEW = {
     showAddFileBtn: false,
     showAddFilesMsg: false,
@@ -54,7 +53,7 @@ const reducer = (viewState, { mode }) => {
         default:
             return viewState;
     }
-}
+};
 
 const OrderDetail = () => {
     const [viewState, dispatch] = useReducer(reducer, INITIAL_VIEW);
@@ -66,7 +65,7 @@ const OrderDetail = () => {
     const [loading, setLoading] = useState(true);
     const [downloadUrl, setDownloadUrl] = useState();
     const [showApiError, setShowApiError] = useState(false);
-    const [uploadError, setUploadError] = useState('')
+    const [uploadError, setUploadError] = useState("");
 
     const {
         showAddFileBtn,
@@ -88,7 +87,7 @@ const OrderDetail = () => {
 
     useEffect(() => {
         fetchOrder();
-        setLoading(false)
+        setLoading(false);
     }, []);
 
     useEffect(() => {
@@ -110,7 +109,7 @@ const OrderDetail = () => {
 
     const fetchOrder = async () => {
         try {
-            setApiError('')
+            setApiError("");
 
             const { data } = await axios.get(
                 `${baseURL}orders/${id}/`,
@@ -139,7 +138,7 @@ const OrderDetail = () => {
 
     const fetchFiles = async () => {
         try {
-            setApiError('')
+            setApiError("");
             const { data } = await axios.get(
                 `${baseURL}orders/${id}/files/`,
                 axiosConfig
@@ -158,12 +157,9 @@ const OrderDetail = () => {
 
     const deleteFile = async (id) => {
         try {
-            setApiError('')
-            setShowApiError(false)
-            await axios.delete(
-                `${baseURL}files/${id}/delete/`,
-                axiosConfig
-            );
+            setApiError("");
+            setShowApiError(false);
+            await axios.delete(`${baseURL}files/${id}/delete/`, axiosConfig);
             setFiles(files.filter((f) => f.id !== id));
             fetchFiles();
             toast.success("file removed.");
@@ -175,15 +171,15 @@ const OrderDetail = () => {
             if (error.response?.status === 404) {
                 setApiError("file doesn't exist.");
             } else {
-                console.error(error);
+                setApiError("Unexpected Error!");
             }
         }
     };
 
     const uploadFile = async (pdf, orderId) => {
         try {
-            setLoading(true)
-            setUploadError('')
+            setLoading(true);
+            setUploadError("");
             setShowApiError(false);
             const newFile = await axios({
                 method: "post",
@@ -197,10 +193,10 @@ const OrderDetail = () => {
                 },
             });
 
-            setLoading(false)
+            setLoading(false);
 
             setFiles([...files, newFile]);
-            
+
             fetchFiles();
 
             if (files.length >= 2) {
@@ -214,7 +210,6 @@ const OrderDetail = () => {
             setUploadError("");
             if (error.response) {
                 if (error?.response?.status === 400) {
-                    // console.log(error?.response?.data.detail);
                     setUploadError(
                         error.response.data.error || error.response.data.file
                     );
@@ -222,10 +217,8 @@ const OrderDetail = () => {
                     setUploadError(
                         "Not authorized. Please check you're logged in."
                     );
-                    console.error(error.response.data.detail);
                 } else if (error.response.status === 403) {
                     setUploadError(error.response.data.detail);
-                    console.error(error.response.data.detail);
                 }
             } else if (error.request) {
                 setUploadError(error.request);
@@ -233,7 +226,7 @@ const OrderDetail = () => {
                 setUploadError(error.message);
             }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -247,7 +240,7 @@ const OrderDetail = () => {
         }
 
         try {
-            setApiError('')
+            setApiError("");
             setShowApiError(false);
             setShowFileForm(false);
             await axios.get(`${baseURL}orders/${orderId}/merge/`, axiosConfig);
@@ -259,13 +252,13 @@ const OrderDetail = () => {
             if (error.response.status === 400) {
                 setApiError(error.response.data.error);
             }
-            console.log(error);
+            setApiError("Unexpected Error!");
         }
     };
 
     const downloadOrder = async (orderId) => {
         setShowApiError(false);
-        setApiError('')
+        setApiError("");
 
         await axios
             .get(`orders/${orderId}/download/`, axiosConfig)
@@ -383,9 +376,7 @@ const OrderDetail = () => {
             </div>
             {showDownloadURL && (
                 <div className="alert link link-info">
-                    <a href={HOST_URL + downloadUrl}>
-                        Download merged PDF
-                    </a>
+                    <a href={HOST_URL + downloadUrl}>Download merged PDF</a>
                 </div>
             )}
             {shwoFileForm && (
@@ -400,6 +391,6 @@ const OrderDetail = () => {
             )}
         </>
     );
-}
+};
 
 export default OrderDetail;
