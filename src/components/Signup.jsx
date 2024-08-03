@@ -36,7 +36,7 @@ const Signup = () => {
                     setErrorMessage(errorObject);
                 }
             } else {
-                setApiError("Unexpected Error!");
+                setErrorMessage("Unexpected Error!");
             }
         }
     };
